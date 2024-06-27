@@ -65,11 +65,38 @@ with col2:
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
-    logo_path = "dt arabic logo .png" # Make sure your logo is in the same directory or provide the full path
-    st.image(logo_path, width=200)  # Adjust width as needed
+    st.markdown(
+        """
+        <style>
+        .logo-container {  # Add a container for the image
+            display: flex;
+            justify-content: center;  # Center horizontally
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    logo_path = "dt arabic logo .png"
+    with st.container():  # Use the container for centering
+        st.image(logo_path, width=200)
+
 with col2:
-    logo_path = "Neom.png" # Make sure your logo is in the same directory or provide the full path
-    st.image(logo_path, width=200)  # Adjust width as needed
+    st.markdown(
+        """
+        <style>
+        .logo-container {  # Add a container for the image
+            display: flex;
+            justify-content: center;  # Center horizontally
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    logo_path = "Neom.png"
+    with st.container():  # Use the container for centering
+        st.image(logo_path, width=200)
 
 # --- Project Overview ---
 st.header("NEOM Bay Airport Project Dashboard")
