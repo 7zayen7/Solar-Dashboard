@@ -62,9 +62,26 @@ with col1:
 with col2:
     st.button("Edit Excel File", on_click=edit_excel_file)
 
+# --- Set Background to White ---
+st.markdown(
+    """
+    <style>
+    .main {
+        background-color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # --- Add Logo ---
-logo_path = "dt arabic logo .png" # Make sure your logo is in the same directory or provide the full path
-st.image(logo_path, width=200)  # Adjust width as needed
+col1, col2 = st.columns(2)
+with col1:
+    logo_path = "dt arabic logo .png" # Make sure your logo is in the same directory or provide the full path
+    st.image(logo_path, width=200)  # Adjust width as needed
+with col2:
+    logo_path = "Neom.png" # Make sure your logo is in the same directory or provide the full path
+    st.image(logo_path, width=200)  # Adjust width as needed
 
 # --- Project Overview ---
 st.header("NEOM Bay Airport Project Dashboard")
