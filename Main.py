@@ -260,10 +260,6 @@ with tab2:
     else:
         st.write("No financial data to display.")
 
-    # Data Exploration Table
-    st.subheader("Data Table")
-    st.write(filtered_df)
-
 with tab3:
     # --- Risk Management ---
     st.subheader("Risk Management")
