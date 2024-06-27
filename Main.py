@@ -231,27 +231,32 @@ with tab2:
                               title='Cost Comparison: Projected vs. Actual')
             st.plotly_chart(fig_cost)
 
-        # Detailed Financial Table with Alerts
-        st.subheader('Financial Details')
-        if not filtered_df.empty:
-            for index, row in filtered_df.iterrows():
-                cost_variance = row['Cost Variance']
-                task_name = row['Task']
-                budget = row['Budget']
-                actual_cost = row['Actual Cost']
+        # Cost Variance Metric Cards with Alerts
+    if not filtered_df.empty:
+        for index, row in filtered_df.iterrows():
+            cost_variance = row['Cost Variance']
+            task_name = row['Task']
 
+            # Create a metric card for each task
+            with st.container():
                 if cost_variance == 0:
-                    st.warning(f"⚠️ Task '{task_name}' has consumed its entire budget of ${budget}.")
+                    st.metric(label=task_name, value=f"${cost_variance}", delta=None, delta_color="off")
+                    st.warning(f"⚠️ Task '{task_name}' has consumed its entire budget.")
                 elif cost_variance < 0:
+                    st.metric(label=task_name, value=f"${cost_variance}", delta=f"${-cost_variance}",
+                              delta_color="inverse")
                     st.error(f"🚨 Task '{task_name}' has exceeded its budget by ${-cost_variance}.")
                 else:
+                    st.metric(label=task_name, value=f"${cost_variance}", delta=f"${cost_variance}",
+                              delta_color="normal")
                     st.success(f"✅ Task '{task_name}' has saved ${cost_variance} of its budget.")
 
-            # Display the table after the alerts
-            st.table(filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']])
-
-        else:
-            st.write("No financial data to display.")
+    # Detailed Financial Table
+    st.subheader('Financial Details')
+    if not filtered_df.empty:
+        st.table(filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']])
+    else:
+        st.write("No financial data to display.")
 
     # Data Exploration Table
     st.subheader("Data Table")
