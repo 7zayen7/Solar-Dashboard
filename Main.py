@@ -130,7 +130,7 @@ with tab1:
     #if not filtered_df.empty and ('Energy Production (kWh)' in filtered_df.columns) and (
             #'Temperature (°C)' in filtered_df.columns):
         #fig_heatmap = px.density_heatmap(filtered_df, x='End Date', y='Temperature (°C)', z='Energy Production (kWh)',
-                                         title='Energy Production vs. Temperature')
+                                         #title='Energy Production vs. Temperature')
         #st.plotly_chart(fig_heatmap)
     #else:
         #st.write("Insufficient data for energy/temperature heatmap.")
