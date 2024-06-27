@@ -1,9 +1,40 @@
 import streamlit as st
+from streamlit.components.v1 import html
 import pandas as pd
 import plotly.express as px
 from streamlit_extras.metric_cards import style_metric_cards
+import webbrowser
+import os
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import datetime
+import pdfkit
+import base64
+import hashlib
+import json
+from io import BytesIO
+import contextlib
+import io
+from io import StringIO
+import uuid
 
-# Function to load data and process it
+# --- Constants ---
+EXCEL_FILENAME = 'solar_project_data.xlsx'
+
+# --- File Watcher (Optional) ---
+class FileChangeHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        if event.src_path == os.path.abspath(EXCEL_FILENAME):
+            st.session_state.df = load_and_process_data()
+            st.experimental_rerun()  # Refresh the app
+
+
+# --- Function to open Excel file ---
+def edit_excel_file():
+    file_path = os.path.abspath(EXCEL_FILENAME)
+    webbrowser.open(file_path)
+
+# --- Data Loading and Processing ---
 def load_and_process_data(filename='solar_project_data.xlsx'):
     try:
         df = pd.read_excel(filename)
@@ -13,63 +44,52 @@ def load_and_process_data(filename='solar_project_data.xlsx'):
         df['End Date'] = pd.to_datetime(df['End Date'])
         return df
     except FileNotFoundError:
-        st.error(f"Error: File '{filename}' not found in the current directory.")
+        st.error(f"Error: File '{filename}' not found. Make sure it's in the same directory as this script.")
         st.stop()
 
-
-# --- Initialize session state ---
+# --- Session State Initialization ---
 if 'df' not in st.session_state:
-    st.session_state.df = pd.DataFrame()
+    st.session_state.df = load_and_process_data()
 
-# --- Load data initially ---
-if st.session_state.df.empty:
-    df = load_and_process_data()
-    st.session_state.df = df
-
-
-# --- Callback to refresh data when a button is clicked ---
+# --- Refresh Function ---
 def refresh_data():
     st.session_state.df = load_and_process_data()
 
-
-# --- Refresh Button ---
-st.button("Refresh Data", on_click=refresh_data)
+# --- Refresh Button and Edit Button ---
+col1, col2 = st.columns(2)
+with col1:
+    st.button("Refresh Data", on_click=refresh_data)  # Pass the function
+with col2:
+    st.button("Edit Excel File", on_click=edit_excel_file)
 
 # --- Project Overview ---
 st.header("NEOM Bay Airport Project Dashboard")
-
 st.subheader("Project Details")
 if not st.session_state.df.empty:
     st.write(f"**Client:** NEOM")
     st.write(f"**Project Name:** NEOM Bay Airport")
     st.write(f"**Location:** NEOM, KSA")
-    st.write(f"**Start Date:** {st.session_state.df['Start Date'].min()}")
-    st.write(f"**End Date:** {st.session_state.df['End Date'].max()}")
-    #st.write(f"**System Size (kWp):** {st.session_state.df['System Size (kWp)'].sum()}")
+    st.write(f"**Start Date:** {st.session_state.df['Start Date'].min().date()}")
+    st.write(f"**End Date:** {st.session_state.df['End Date'].max().date()}")
 else:
-    st.warning("No data found in the Excel file.")
+    st.warning("No data found. Please check the Excel file.")
 
-# --- Filters (Sidebar) ---
-# Moved the filters section after loading and processing the data
+
+# --- Sidebar Filters ---
 st.sidebar.header("Filters")
 selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
-start_time = st.session_state.df['Start Date'].min().to_pydatetime()
-end_time = st.session_state.df['End Date'].max().to_pydatetime()
-
-start_date, end_date = st.sidebar.slider(
-    "Select Date Range",
-    value=(start_time, end_time),
-    format="YYYY-MM-DD")
-
 task_filter = st.sidebar.text_input("Search Tasks")
+start_time = st.session_state.df['Start Date'].min().date()
+end_time = st.session_state.df['End Date'].max().date()
+start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
 
-# Apply filters to the dataframe (convert back to Timestamps)
+# Apply filters directly to session state data
 filtered_df = st.session_state.df[
     (st.session_state.df['Category'].isin(selected_categories)) &
-    (st.session_state.df['Start Date'] >= pd.Timestamp(start_date)) &
-    (st.session_state.df['End Date'] <= pd.Timestamp(end_date)) &
-    (st.session_state.df['Task'].str.contains(task_filter, case=False))
-    ]
+    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
+    (st.session_state.df['Start Date'].dt.date >= start_date) &
+    (st.session_state.df['End Date'].dt.date <= end_date)
+]
 
 # --- Dashboard with Tabs ---
 tab1, tab2, tab3 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management"])
@@ -116,24 +136,29 @@ with tab1:
     style_metric_cards()
 
     # Gantt Chart with Task Progress
+    st.subheader("Project Timeline")
     fig_gantt = px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
-    fig_gantt.update_yaxes(autorange="reversed")
+    fig_gantt.update_yaxes(autorange="reversed") # Update the fig_gantt before using it
     st.plotly_chart(fig_gantt, use_container_width=True)
 
-    # Individual Task Progress Bars
+    # Individual Task Progress Bars with Percentages and Alerts
     st.subheader("Task Progress")
     for index, row in filtered_df.iterrows():
-        st.write(f"{row['Task']}:")
-        st.progress(row['Percent Complete'] / 100)
+        task_name = row['Task']
+        percent_complete = row['Percent Complete']
+        end_date = row['End Date']
 
-        # --- Energy Production and Temperature Heatmap ---
-    #if not filtered_df.empty and ('Energy Production (kWh)' in filtered_df.columns) and (
-            #'Temperature (°C)' in filtered_df.columns):
-        #fig_heatmap = px.density_heatmap(filtered_df, x='End Date', y='Temperature (°C)', z='Energy Production (kWh)',
-                                         #title='Energy Production vs. Temperature')
-        #st.plotly_chart(fig_heatmap)
-    #else:
-        #st.write("Insufficient data for energy/temperature heatmap.")
+        col1, col2, col3 = st.columns([3, 1, 1])
+        with col1:
+            st.write(f"**{task_name}:**")
+        with col2:
+            st.progress(percent_complete / 100)
+        with col3:
+            st.write(f"{percent_complete:.1f}%")
+
+        # Add Alert
+        if percent_complete < 100 and end_date < datetime.datetime.now():  # Check for deadline exceeded
+            st.warning(f"⚠️ Task '{task_name}' is overdue and not complete!")
 
 with tab2:
     # --- Financial Tracking ---
