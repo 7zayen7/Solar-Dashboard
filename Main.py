@@ -1,45 +1,60 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from streamlit_extras.metric_cards import style_metric_cards
 
-# Updated Sample Project Data
-data = {
-    'Task': ['Engineering Design', 'Permitting', 'Procurement', 'Site Preparation', 'Module Installation', 'Electrical Work', 'Commissioning'],
-    'Start Date': ['2024-01-15', '2024-02-01', '2024-03-15', '2024-04-01', '2024-05-01', '2024-06-15', '2024-07-15'],
-    'End Date': ['2024-02-28', '2024-03-31', '2024-04-30', '2024-04-15', '2024-06-30', '2024-07-14', '2024-08-01'],
-    'Percent Complete': [95, 80, 60, 100, 30, 0, 0],
-    'Category': ['Engineering', 'Legal', 'Procurement', 'Construction', 'Construction', 'Electrical', 'Commissioning'],
-    'Budget': [100000, 50000, 500000, 200000, 800000, 150000, 100000],
-    'Actual Cost': [98000, 42000, 320000, 195000, 250000, 0, 0],
-    'System Size (kWp)': [0, 0, 0, 0, 1500, 0, 0],
-    'Energy Production (kWh)': [0, 0, 0, 0, 12000, 0, 0],  # Sample energy production data
-    'Temperature (°C)': [25, 22, 28, 32, 35, 31, 29],     # Sample temperature data
-}
+# Function to load data and process it
+def load_and_process_data(filename='solar_project_data.xlsx'):
+    try:
+        df = pd.read_excel(filename)
+        df['Cost Variance'] = df['Budget'] - df['Actual Cost']
+        df.fillna(0, inplace=True)
+        df['Start Date'] = pd.to_datetime(df['Start Date'])
+        df['End Date'] = pd.to_datetime(df['End Date'])
+        return df
+    except FileNotFoundError:
+        st.error(f"Error: File '{filename}' not found in the current directory.")
+        st.stop()
 
-# Create DataFrame and handle NaN values
-df = pd.DataFrame(data)
-df['Cost Variance'] = df['Budget'] - df['Actual Cost']
-df.fillna(0, inplace=True)  # Fill any missing values with 0
-# Convert date columns to datetime
-df['Start Date'] = pd.to_datetime(df['Start Date'])
-df['End Date'] = pd.to_datetime(df['End Date'])
+
+# --- Initialize session state ---
+if 'df' not in st.session_state:
+    st.session_state.df = pd.DataFrame()
+
+# --- Load data initially ---
+if st.session_state.df.empty:
+    df = load_and_process_data()
+    st.session_state.df = df
+
+
+# --- Callback to refresh data when a button is clicked ---
+def refresh_data():
+    st.session_state.df = load_and_process_data()
+
+
+# --- Refresh Button ---
+st.button("Refresh Data", on_click=refresh_data)
 
 # --- Project Overview ---
-st.header("Solar Project Dashboard")
+st.header("NEOM Bay Airport Project Dashboard")
 
 st.subheader("Project Details")
-st.write(f"**Client:** SolarCorp")
-st.write(f"**Project Name:** Sunny Acres Solar Farm")
-st.write(f"**Location:** Arizona, USA")
-st.write(f"**Start Date:** {df['Start Date'].min()}")
-st.write(f"**End Date:** {df['End Date'].max()}")
-st.write(f"**System Size (kWp):** {df['System Size (kWp)'].sum()}")
+if not st.session_state.df.empty:
+    st.write(f"**Client:** NEOM")
+    st.write(f"**Project Name:** NEOM Bay Airport")
+    st.write(f"**Location:** NEOM, KSA")
+    st.write(f"**Start Date:** {st.session_state.df['Start Date'].min()}")
+    st.write(f"**End Date:** {st.session_state.df['End Date'].max()}")
+    #st.write(f"**System Size (kWp):** {st.session_state.df['System Size (kWp)'].sum()}")
+else:
+    st.warning("No data found in the Excel file.")
 
 # --- Filters (Sidebar) ---
+# Moved the filters section after loading and processing the data
 st.sidebar.header("Filters")
-selected_categories = st.sidebar.multiselect("Filter by Category", df['Category'].unique())
-start_time = df['Start Date'].min().to_pydatetime()
-end_time = df['End Date'].max().to_pydatetime()
+selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
+start_time = st.session_state.df['Start Date'].min().to_pydatetime()
+end_time = st.session_state.df['End Date'].max().to_pydatetime()
 
 start_date, end_date = st.sidebar.slider(
     "Select Date Range",
@@ -49,12 +64,12 @@ start_date, end_date = st.sidebar.slider(
 task_filter = st.sidebar.text_input("Search Tasks")
 
 # Apply filters to the dataframe (convert back to Timestamps)
-filtered_df = df[
-    (df['Category'].isin(selected_categories)) &
-    (df['Start Date'] >= pd.Timestamp(start_date)) &
-    (df['End Date'] <= pd.Timestamp(end_date))      &
-    (df['Task'].str.contains(task_filter, case=False))
-]
+filtered_df = st.session_state.df[
+    (st.session_state.df['Category'].isin(selected_categories)) &
+    (st.session_state.df['Start Date'] >= pd.Timestamp(start_date)) &
+    (st.session_state.df['End Date'] <= pd.Timestamp(end_date)) &
+    (st.session_state.df['Task'].str.contains(task_filter, case=False))
+    ]
 
 # --- Dashboard with Tabs ---
 tab1, tab2, tab3 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management"])
@@ -62,12 +77,43 @@ tab1, tab2, tab3 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Man
 with tab1:
     # --- Progress Tracking ---
     st.subheader("Project Progress")
-    if not filtered_df.empty:
-        overall_progress = filtered_df['Percent Complete'].mean() / 100
-    else:
-        overall_progress = 0
-    st.progress(overall_progress)
-    st.write(f"Overall Project Progress (Filtered): {overall_progress * 100:.1f}%")
+
+    # --- KPI cards for metrics ---
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown(
+            f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+            f'<span style="color:black">Total Tasks: {len(st.session_state.df)}  <span style="font-size:smaller;">({len(filtered_df)} filtered)</span></span>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+    with col2:
+        st.markdown(
+            f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+            f'<span style="color:black">Tasks Completed: {st.session_state.df["Percent Complete"].value_counts().get(100, 0)}</span>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+    with col3:
+        if not filtered_df.empty:
+            overall_progress = filtered_df['Percent Complete'].mean() / 100
+            st.markdown(
+                f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+                f'<span style="color:black">Overall Progress: {overall_progress * 100:.1f}%</span>'
+                '</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            st.markdown(
+                f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+                f'<span style="color:black">Overall Progress: No data available</span>'
+                '</div>',
+                unsafe_allow_html=True
+            )
+    style_metric_cards()
 
     # Gantt Chart with Task Progress
     fig_gantt = px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
@@ -80,10 +126,14 @@ with tab1:
         st.write(f"{row['Task']}:")
         st.progress(row['Percent Complete'] / 100)
 
-    # Energy Production Line Chart
-    st.subheader("Energy Production")
-    fig_energy = px.line(filtered_df, x='End Date', y='Energy Production (kWh)', title='Cumulative Energy Production')
-    st.plotly_chart(fig_energy)
+        # --- Energy Production and Temperature Heatmap ---
+    if not filtered_df.empty and ('Energy Production (kWh)' in filtered_df.columns) and (
+            'Temperature (°C)' in filtered_df.columns):
+        fig_heatmap = px.density_heatmap(filtered_df, x='End Date', y='Temperature (°C)', z='Energy Production (kWh)',
+                                         title='Energy Production vs. Temperature')
+        st.plotly_chart(fig_heatmap)
+    else:
+        st.write("Insufficient data for energy/temperature heatmap.")
 
 with tab2:
     # --- Financial Tracking ---
@@ -113,6 +163,13 @@ with tab2:
     else:
         st.write("No data to display for cost comparison.")
 
+        # --- Projected vs. Actual Cost Bar Chart ---
+        if not filtered_df.empty:
+            cost_df = filtered_df.melt(id_vars='Task', value_vars=['Budget', 'Actual Cost'])
+            fig_cost = px.bar(cost_df, x='Task', y='value', color='variable', barmode='group',
+                              title='Cost Comparison: Projected vs. Actual')
+            st.plotly_chart(fig_cost)
+
     # Detailed Financial Table
     st.subheader('Financial Details')
     if not filtered_df.empty:
@@ -137,14 +194,24 @@ with tab3:
 
     st.table(pd.DataFrame(risk_data))
 
-# --- Timeline ---
-st.subheader("Project Timeline")
-fig_timeline = px.timeline(df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
-fig_timeline.update_yaxes(autorange="reversed")
-st.plotly_chart(fig_timeline)  # Interactive timeline
+    # --- Data Exploration Table ---
+    st.subheader("Data Table")
+    st.write(filtered_df)
 
 # --- Key Metrics Summary ---
 st.subheader("Key Metrics")
-st.write(f"**Total Tasks:** {len(df)}")
-st.write(f"**Tasks Completed:** {df['Percent Complete'].value_counts().get(100, 0)}")
+st.write(f"**Total Tasks:** {len(st.session_state.df)}")  #Access df from the session state
+st.write(f"**Tasks Completed:** {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}")
 
+if not filtered_df.empty:
+    overall_progress = filtered_df['Percent Complete'].mean() / 100
+    st.write(f"**Overall Project Progress (Filtered):** {overall_progress * 100:.1f}%")
+else:
+    st.write("**Overall Project Progress (Filtered):** No data available.")
+
+
+# --- Timeline ---
+st.subheader("Project Timeline")
+fig_timeline = px.timeline(st.session_state.df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
+fig_timeline.update_yaxes(autorange="reversed")
+st.plotly_chart(fig_timeline)  # Interactive timeline
