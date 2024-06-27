@@ -62,18 +62,6 @@ with col1:
 with col2:
     st.button("Edit Excel File", on_click=edit_excel_file)
 
-# --- Set Background to White ---
-st.markdown(
-    """
-    <style>
-    .main {
-        background-color: white;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
