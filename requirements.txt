@@ -2,4 +2,7 @@ streamlit
 pandas
 plotly
 streamlit-extras
+pdfkit
+wkhtmltopdf
+watchdog
 openpyxl
