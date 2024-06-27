@@ -231,12 +231,27 @@ with tab2:
                               title='Cost Comparison: Projected vs. Actual')
             st.plotly_chart(fig_cost)
 
-    # Detailed Financial Table
-    st.subheader('Financial Details')
-    if not filtered_df.empty:
-        st.table(filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']])
-    else:
-        st.write("No financial data to display.")
+        # Detailed Financial Table with Alerts
+        st.subheader('Financial Details')
+        if not filtered_df.empty:
+            for index, row in filtered_df.iterrows():
+                cost_variance = row['Cost Variance']
+                task_name = row['Task']
+                budget = row['Budget']
+                actual_cost = row['Actual Cost']
+
+                if cost_variance == 0:
+                    st.warning(f"⚠️ Task '{task_name}' has consumed its entire budget of ${budget}.")
+                elif cost_variance < 0:
+                    st.error(f"🚨 Task '{task_name}' has exceeded its budget by ${-cost_variance}.")
+                else:
+                    st.success(f"✅ Task '{task_name}' has saved ${cost_variance} of its budget.")
+
+            # Display the table after the alerts
+            st.table(filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']])
+
+        else:
+            st.write("No financial data to display.")
 
     # Data Exploration Table
     st.subheader("Data Table")
