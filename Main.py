@@ -18,6 +18,42 @@ import io
 from io import StringIO
 import uuid
 
+# --- Add Logo ---
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown(
+        """
+        <style>
+        .logo-container {  # Add a container for the image
+            display: flex;
+            justify-content: center;  # Center horizontally
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    logo_path = "dt arabic logo .png"
+    with st.container():  # Use the container for centering
+        st.image(logo_path, width=200)
+
+with col2:
+    st.markdown(
+        """
+        <style>
+        .logo-container {  # Add a container for the image
+            display: flex;
+            justify-content: center;  # Center horizontally
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    logo_path = "Neom.png"
+    with st.container():  # Use the container for centering
+        st.image(logo_path, width=200)
+
 # --- Constants ---
 EXCEL_FILENAME = 'solar_project_data.xlsx'
 
@@ -61,42 +97,6 @@ with col1:
     st.button("Refresh Data", on_click=refresh_data)  # Pass the function
 with col2:
     st.button("Edit Excel File", on_click=edit_excel_file)
-
-# --- Add Logo ---
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown(
-        """
-        <style>
-        .logo-container {  # Add a container for the image
-            display: flex;
-            justify-content: center;  # Center horizontally
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    logo_path = "dt arabic logo .png"
-    with st.container():  # Use the container for centering
-        st.image(logo_path, width=200)
-
-with col2:
-    st.markdown(
-        """
-        <style>
-        .logo-container {  # Add a container for the image
-            display: flex;
-            justify-content: center;  # Center horizontally
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    logo_path = "Neom.png"
-    with st.container():  # Use the container for centering
-        st.image(logo_path, width=200)
 
 # --- Project Overview ---
 st.header("NEOM Bay Airport Project Dashboard")
