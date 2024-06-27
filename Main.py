@@ -242,31 +242,30 @@ with tab2:
             task_name = row['Task']
 
             # Create a metric card for each task in the current column
-            with cols[col_index]:
-                if cost_variance == 0:
-                    st.metric(label=task_name, value=f"${cost_variance}", delta=f"${-cost_variance}",
-                              delta_color="off",
-                              # Add these parameters
-                              label_visibility="visible",
-                              value_color="black",  # Or another dark color like #333
-                              )
-                elif cost_variance < 0:
-                    st.metric(label=task_name, value=f"${cost_variance}", delta=f"${-cost_variance}",
-                              delta_color="off",
-                              # Add these parameters
-                              label_visibility="visible",
-                              value_color="black",  # Or another dark color like #333
-                              )
-                else:
-                    st.metric(label=task_name, value=f"${cost_variance}", delta=f"${-cost_variance}",
-                              delta_color="off",
-                              # Add these parameters
-                              label_visibility="visible",
-                              value_color="black",  # Or another dark color like #333
-                              )
+            for index, row in filtered_df.iterrows():
+                # Explicitly convert cost variance to float
+                try:
+                    cost_variance = float(row['Cost Variance'])
+                except ValueError:  # Handle non-numeric values
+                    st.error(
+                        f"Error: Non-numeric cost variance value found for task '{row['Task']}'. Please check your data.")
+                    continue  # Skip this task if an error occurs
 
-                    # Move to the next column, wrapping back to the first if necessary
-            col_index = (col_index + 1) % num_columns
+                task_name = row['Task']
+
+            with cols[col_index]:
+                # Update st.metric calls, ensuring values are formatted correctly
+                if cost_variance == 0:
+                    st.metric(label=task_name, value=f"${cost_variance:.2f}", delta=None, delta_color="off")
+                    st.warning(f"⚠️ Task '{task_name}' has consumed its entire budget.")
+                elif cost_variance < 0:
+                    st.metric(label=task_name, value=f"${cost_variance:.2f}", delta=f"${-cost_variance:.2f}",
+                              delta_color="off")
+                    st.error(f"🚨 Task '{task_name}' has exceeded its budget by ${-cost_variance:.2f}.")
+                else:
+                    st.metric(label=task_name, value=f"${cost_variance:.2f}", delta=f"${cost_variance:.2f}",
+                              delta_color="off")
+                    st.success(f"✅ Task '{task_name}' has saved ${cost_variance:.2f} of its budget.")
 
     # Detailed Financial Table
     st.subheader('Financial Details')
