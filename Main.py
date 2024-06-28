@@ -111,8 +111,7 @@ def generate_pdf_report(filtered_df):
     tab2_content = tab2.get_content_as_string()
     tab3_content = tab3.get_content_as_string()
 
-    # Create HTML content with the filtered data and any desired formatting
-html_string = f"""
+    html_string = f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -149,7 +148,7 @@ html_string = f"""
     </html>
     """
 
-options = {
+    options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
         'margin-right': '0.75in',
@@ -158,8 +157,8 @@ options = {
         'encoding': "UTF-8",
         'no-outline': None
     }
-pdf = pdfkit.from_string(html_string, False, options=options) 
-    return pdf
+    pdf = pdfkit.from_string(html_string, False, options=options) 
+    return pdf  # This line should be aligned with the function definition and the 'options' dictionary
 
 # --- Refresh Function ---
 def refresh_data():
