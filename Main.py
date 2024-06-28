@@ -106,27 +106,11 @@ filtered_df = st.session_state.df[
     (st.session_state.df['End Date'].dt.date <= end_date)
 ]
 
+# --- Report Generation ---
 def generate_pdf_report(filtered_df):
+    """Generates a PDF report from the filtered DataFrame."""
 
-    # --- Capture content from each tab ---
-    tab1_buffer = StringIO()
-    with redirect_stdout(tab1_buffer):
-        with tab1:
-            # ... all your existing content for tab1
-    tab1_content = tab1_buffer.getvalue()
-    
-    tab2_buffer = StringIO()
-    with redirect_stdout(tab2_buffer):
-        with tab2:
-            # ... all your existing content for tab2
-    tab2_content = tab2_buffer.getvalue()
-
-    tab3_buffer = StringIO()
-    with redirect_stdout(tab3_buffer):
-        with tab3:
-            # ... all your existing content for tab3
-    tab3_content = tab3_buffer.getvalue()
-
+    # Create HTML content with the filtered data and any desired formatting
     html_string = f"""
     <!DOCTYPE html>
     <html>
@@ -151,10 +135,6 @@ def generate_pdf_report(filtered_df):
         <p><b>Total Tasks:</b> {len(st.session_state.df)}</p>
         <p><b>Tasks Completed:</b> {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}</p>
 
-        {tab1_content} 
-        {tab2_content} 
-        {tab3_content} 
-
         <h2>Financial Details</h2>
         {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
 
@@ -173,9 +153,9 @@ def generate_pdf_report(filtered_df):
         'encoding': "UTF-8",
         'no-outline': None
     }
-    pdf = pdfkit.from_string(html_string, False, options=options) 
-    return pdf  # This line should be aligned with the function definition and the 'options' dictionary
-
+    pdf = pdfkit.from_string(html_string, False, options=options)  # Remove config
+    return pdf
+    
 # --- Refresh Function ---
 def refresh_data():
     st.session_state.df = load_and_process_data()
