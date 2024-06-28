@@ -159,7 +159,7 @@ options = {
         'no-outline': None
     }
 pdf = pdfkit.from_string(html_string, False, options=options) 
-return pdf
+    return pdf
 
 # --- Refresh Function ---
 def refresh_data():
