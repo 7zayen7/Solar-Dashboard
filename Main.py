@@ -112,7 +112,7 @@ def generate_pdf_report(filtered_df):
     tab3_content = tab3.get_content_as_string()
 
     # Create HTML content with the filtered data and any desired formatting
-    html_string = f"""
+        html_string = f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -136,9 +136,9 @@ def generate_pdf_report(filtered_df):
         <p><b>Total Tasks:</b> {len(st.session_state.df)}</p>
         <p><b>Tasks Completed:</b> {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}</p>
 
-        {tab1_content} {/* Content from Tab 1 (Progress Overview) */}
-        {tab2_content} {/* Content from Tab 2 (Financial Tracking) */}
-        {tab3_content} {/* Content from Tab 3 (Risk Management) */}
+        {tab1_content} 
+        {tab2_content} 
+        {tab3_content} 
 
         <h2>Financial Details</h2>
         {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
