@@ -158,8 +158,8 @@ options = {
         'encoding': "UTF-8",
         'no-outline': None
     }
-    pdf = pdfkit.from_string(html_string, False, options=options) 
-    return pdf
+pdf = pdfkit.from_string(html_string, False, options=options) 
+return pdf
 
 # --- Refresh Function ---
 def refresh_data():
