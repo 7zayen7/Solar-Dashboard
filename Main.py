@@ -17,6 +17,9 @@ import contextlib
 import io
 from io import StringIO
 import uuid
+import subprocess
+subprocess.call(['apt-get', 'update'])
+subprocess.call(['apt-get', 'install', '-y', 'wkhtmltopdf'])
 
 # --- Add Logo ---
 col1, col2 = st.columns(2)
