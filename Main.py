@@ -55,7 +55,7 @@ with col2:
         st.image(logo_path, width=200)
 
 # --- Constants ---
-EXCEL_FILENAME = 'solar_project_data.xlsx'
+EXCEL_FILENAME = 'https://deserttech-my.sharepoint.com/:x:/r/personal/mhzayen_desert-technologies_com/_layouts/15/Doc.aspx?sourcedoc=%7BA2D30270-7718-4C50-BF6B-815C253DEBCC%7D&file=solar_project_data.xlsx&action=default&mobileredirect=true'
 
 # --- File Watcher (Optional) ---
 class FileChangeHandler(FileSystemEventHandler):
