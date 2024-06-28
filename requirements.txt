@@ -6,3 +6,4 @@ pdfkit
 wkhtmltopdf
 watchdog
 openpyxl
+kaleido
