@@ -149,7 +149,7 @@ html_string = f"""
     </html>
     """
 
-    options = {
+options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
         'margin-right': '0.75in',
