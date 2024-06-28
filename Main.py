@@ -87,26 +87,67 @@ def load_and_process_data(filename='solar_project_data.xlsx'):
 if 'df' not in st.session_state:
     st.session_state.df = load_and_process_data()
 df=st.session_state.df
-
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
-selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
+
+# Filter by Category (with unique key)
+selected_categories = st.sidebar.multiselect(
+    "Filter by Category", 
+    st.session_state.df['Category'].unique(), 
+    key="category_filter"  # Add a unique key
+)
+
 task_filter = st.sidebar.text_input("Search Tasks")
 start_time = st.session_state.df['Start Date'].min().date()
 end_time = st.session_state.df['End Date'].max().date()
 start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
 
 # Apply filters directly to session state data
-filtered_df = st.session_state.df[
-    (st.session_state.df['Category'].isin(selected_categories)) &
-    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
-    (st.session_state.df['Start Date'].dt.date >= start_date) &
-    (st.session_state.df['End Date'].dt.date <= end_date)
+filtered_df = df[
+    (df['Category'].isin(selected_categories)) &
+    (df['Task'].str.contains(task_filter, case=False)) &
+    (df['Start Date'].dt.date >= start_date) &
+    (df['End Date'].dt.date <= end_date)
 ]
-
 # --- Report Generation ---
+path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+
 def generate_pdf_report(filtered_df):
-    # ... (your HTML string for the report)
+   # Create HTML content with the filtered data and any desired formatting
+    html_string = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
+        <style>
+            /* Add CSS for styling if desired */
+            table {{
+                border-collapse: collapse;
+                width: 100%;
+            }}
+            th, td {{
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>Project Report - NEOM Bay Airport</h1>
+        <h2>Key Metrics</h2>
+        <p><b>Total Tasks:</b> {len(st.session_state.df)}</p>
+        <p><b>Tasks Completed:</b> {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}</p>
+
+        <h2>Financial Details</h2>
+        {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
+
+        <h2>Gantt Chart</h2>
+        <img src='data:image/png;base64,{base64.b64encode(px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category").to_image(format="png")).decode()}' />
+    </body>
+    </html>
+    """
 
     options = {
         'page-size': 'Letter',
@@ -118,9 +159,6 @@ def generate_pdf_report(filtered_df):
         'no-outline': None
     }
     pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
-    return pdf
-
-    # Return the generated PDF file
     return pdf
 
 # --- Refresh Function ---
