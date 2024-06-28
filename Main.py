@@ -17,9 +17,6 @@ import contextlib
 import io
 from io import StringIO
 import uuid
-import subprocess
-subprocess.call(['apt-get', 'update'])
-subprocess.call(['apt-get', 'install', '-y', 'wkhtmltopdf'])
 
 # --- Add Logo ---
 col1, col2 = st.columns(2)
@@ -90,35 +87,28 @@ def load_and_process_data(filename='solar_project_data.xlsx'):
 if 'df' not in st.session_state:
     st.session_state.df = load_and_process_data()
 df=st.session_state.df
+
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
-
-# Filter by Category (with unique key)
-selected_categories = st.sidebar.multiselect(
-    "Filter by Category", 
-    st.session_state.df['Category'].unique(), 
-    key="category_filter"  # Add a unique key
-)
-
+selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
 task_filter = st.sidebar.text_input("Search Tasks")
 start_time = st.session_state.df['Start Date'].min().date()
 end_time = st.session_state.df['End Date'].max().date()
 start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
 
 # Apply filters directly to session state data
-filtered_df = df[
-    (df['Category'].isin(selected_categories)) &
-    (df['Task'].str.contains(task_filter, case=False)) &
-    (df['Start Date'].dt.date >= start_date) &
-    (df['End Date'].dt.date <= end_date)
+filtered_df = st.session_state.df[
+    (st.session_state.df['Category'].isin(selected_categories)) &
+    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
+    (st.session_state.df['Start Date'].dt.date >= start_date) &
+    (st.session_state.df['End Date'].dt.date <= end_date)
 ]
+
 # --- Report Generation ---
-path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
-
-
 def generate_pdf_report(filtered_df):
-   # Create HTML content with the filtered data and any desired formatting
+    """Generates a PDF report from the filtered DataFrame."""
+
+    # Create HTML content with the filtered data and any desired formatting
     html_string = f"""
     <!DOCTYPE html>
     <html>
@@ -152,16 +142,10 @@ def generate_pdf_report(filtered_df):
     </html>
     """
 
-    options = {
-        'page-size': 'Letter',
-        'margin-top': '0.75in',
-        'margin-right': '0.75in',
-        'margin-bottom': '0.75in',
-        'margin-left': '0.75in',
-        'encoding': "UTF-8",
-        'no-outline': None
-    }
-    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
+    # Convert HTML to PDF
+    pdf = pdfkit.from_string(html_string, False, configuration=config)
+
+    # Return the generated PDF file
     return pdf
 
 # --- Refresh Function ---
