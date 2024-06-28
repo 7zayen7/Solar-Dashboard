@@ -17,6 +17,8 @@ import contextlib
 import io
 from io import StringIO
 import uuid
+from contextlib import redirect_stdout
+
 
 # --- Add Logo ---
 col1, col2 = st.columns(2)
@@ -105,11 +107,25 @@ filtered_df = st.session_state.df[
 ]
 
 def generate_pdf_report(filtered_df):
+
+    # --- Capture content from each tab ---
+    tab1_buffer = StringIO()
+    with redirect_stdout(tab1_buffer):
+        with tab1:
+            # ... all your existing content for tab1
+    tab1_content = tab1_buffer.getvalue()
     
-    # Capture content from all tabs
-    tab1_content = tab1.get_content_as_string()  
-    tab2_content = tab2.get_content_as_string()
-    tab3_content = tab3.get_content_as_string()
+    tab2_buffer = StringIO()
+    with redirect_stdout(tab2_buffer):
+        with tab2:
+            # ... all your existing content for tab2
+    tab2_content = tab2_buffer.getvalue()
+
+    tab3_buffer = StringIO()
+    with redirect_stdout(tab3_buffer):
+        with tab3:
+            # ... all your existing content for tab3
+    tab3_content = tab3_buffer.getvalue()
 
     html_string = f"""
     <!DOCTYPE html>
