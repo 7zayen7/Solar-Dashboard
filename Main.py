@@ -18,6 +18,11 @@ import io
 from io import StringIO
 import uuid
 
+# --- Configuration for wkhtmltopdf ---
+path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Replace with your actual path
+config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
+
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
@@ -86,13 +91,74 @@ def load_and_process_data(filename='solar_project_data.xlsx'):
 # --- Session State Initialization ---
 if 'df' not in st.session_state:
     st.session_state.df = load_and_process_data()
+df=st.session_state.df
+
+# --- Sidebar Filters ---
+st.sidebar.header("Filters")
+selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
+task_filter = st.sidebar.text_input("Search Tasks")
+start_time = st.session_state.df['Start Date'].min().date()
+end_time = st.session_state.df['End Date'].max().date()
+start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
+
+# Apply filters directly to session state data
+filtered_df = st.session_state.df[
+    (st.session_state.df['Category'].isin(selected_categories)) &
+    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
+    (st.session_state.df['Start Date'].dt.date >= start_date) &
+    (st.session_state.df['End Date'].dt.date <= end_date)
+]
+
+# --- Report Generation ---
+def generate_pdf_report(filtered_df):
+    """Generates a PDF report from the filtered DataFrame."""
+
+    # Create HTML content with the filtered data and any desired formatting
+    html_string = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
+        <style>
+            /* Add CSS for styling if desired */
+            table {{
+                border-collapse: collapse;
+                width: 100%;
+            }}
+            th, td {{
+                border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;
+            }}
+        </style>
+    </head>
+    <body>
+        <h1>Project Report - NEOM Bay Airport</h1>
+        <h2>Key Metrics</h2>
+        <p><b>Total Tasks:</b> {len(st.session_state.df)}</p>
+        <p><b>Tasks Completed:</b> {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}</p>
+
+        <h2>Financial Details</h2>
+        {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
+
+        <h2>Gantt Chart</h2>
+        <img src='data:image/png;base64,{base64.b64encode(px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category").to_image(format="png")).decode()}' />
+    </body>
+    </html>
+    """
+
+    # Convert HTML to PDF
+    pdf = pdfkit.from_string(html_string, False, configuration=config)
+
+    # Return the generated PDF file
+    return pdf
 
 # --- Refresh Function ---
 def refresh_data():
     st.session_state.df = load_and_process_data()
 
 # --- Refresh Button and Edit Button ---
-col1, col2 = st.columns(2)
+col1, col2= st.columns(2)
 with col1:
     st.button("Refresh Data", on_click=refresh_data)  # Pass the function
 with col2:
@@ -110,22 +176,6 @@ if not st.session_state.df.empty:
 else:
     st.warning("No data found. Please check the Excel file.")
 
-
-# --- Sidebar Filters ---
-st.sidebar.header("Filters")
-selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
-task_filter = st.sidebar.text_input("Search Tasks")
-start_time = st.session_state.df['Start Date'].min().date()
-end_time = st.session_state.df['End Date'].max().date()
-start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
-
-# Apply filters directly to session state data
-filtered_df = st.session_state.df[
-    (st.session_state.df['Category'].isin(selected_categories)) &
-    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
-    (st.session_state.df['Start Date'].dt.date >= start_date) &
-    (st.session_state.df['End Date'].dt.date <= end_date)
-]
 
 # --- Dashboard with Tabs ---
 tab1, tab2, tab3 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management"])
@@ -277,6 +327,21 @@ with tab3:
     st.subheader("Data Table")
     st.write(filtered_df)
 
+# --- Report Generation Button ---
+st.sidebar.subheader("Generate Report")
+if st.sidebar.button("Download PDF Report"):
+    if filtered_df.empty:
+        st.sidebar.warning("No data to include in the report. Apply filters to select data.")
+    else:
+        pdf_report = generate_pdf_report(filtered_df)
+        # Download report button with a unique file name
+        st.sidebar.download_button(
+            label="Download PDF Report",
+            data=pdf_report,
+            file_name=f"NEOM_Bay_Airport_Report_{datetime.datetime.now().strftime('%Y-%m-%d')}.pdf",
+            mime="application/pdf",
+        )
+
 # --- Key Metrics Summary ---
 st.subheader("Key Metrics")
 st.write(f"**Total Tasks:** {len(st.session_state.df)}")  #Access df from the session state
@@ -287,7 +352,6 @@ if not filtered_df.empty:
     st.write(f"**Overall Project Progress (Filtered):** {overall_progress * 100:.1f}%")
 else:
     st.write("**Overall Project Progress (Filtered):** No data available.")
-
 
 # --- Timeline ---
 st.subheader("Project Timeline")
