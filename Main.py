@@ -106,44 +106,19 @@ filtered_df = st.session_state.df[
 
 # --- Report Generation ---
 def generate_pdf_report(filtered_df):
-    """Generates a PDF report from the filtered DataFrame."""
+    # ... (your HTML string for the report)
 
-    # Create HTML content with the filtered data and any desired formatting
-    html_string = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
-        <style>
-            /* Add CSS for styling if desired */
-            table {{
-                border-collapse: collapse;
-                width: 100%;
-            }}
-            th, td {{
-                border: 1px solid #dddddd;
-                text-align: left;
-                padding: 8px;
-            }}
-        </style>
-    </head>
-    <body>
-        <h1>Project Report - NEOM Bay Airport</h1>
-        <h2>Key Metrics</h2>
-        <p><b>Total Tasks:</b> {len(st.session_state.df)}</p>
-        <p><b>Tasks Completed:</b> {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}</p>
-
-        <h2>Financial Details</h2>
-        {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
-
-        <h2>Gantt Chart</h2>
-        <img src='data:image/png;base64,{base64.b64encode(px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category").to_image(format="png")).decode()}' />
-    </body>
-    </html>
-    """
-
-    # Convert HTML to PDF
-    pdf = pdfkit.from_string(html_string, False, configuration=config)
+    options = {
+        'page-size': 'Letter',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'no-outline': None
+    }
+    pdf = pdfkit.from_string(html_string, False, configuration=config, options=options)
+    return pdf
 
     # Return the generated PDF file
     return pdf
