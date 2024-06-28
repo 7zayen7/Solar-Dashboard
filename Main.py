@@ -112,7 +112,7 @@ def generate_pdf_report(filtered_df):
     tab3_content = tab3.get_content_as_string()
 
     # Create HTML content with the filtered data and any desired formatting
-        html_string = f"""
+html_string = f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -148,7 +148,7 @@ def generate_pdf_report(filtered_df):
     </body>
     </html>
     """
-    
+
     options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -158,7 +158,7 @@ def generate_pdf_report(filtered_df):
         'encoding': "UTF-8",
         'no-outline': None
     }
-    pdf = pdfkit.from_string(html_string, False, options=options)  # Remove config
+    pdf = pdfkit.from_string(html_string, False, options=options) 
     return pdf
 
 # --- Refresh Function ---
