@@ -474,8 +474,8 @@ with tab2:
 
     # Create a dictionary to store EVM metrics
     evm_metrics = {
-        "Schedule Variance (SV)": f"${project_sv:.2f}",
-        "Cost Variance (CV)": f"${project_cv:.2f}",
+        "Schedule Variance (SV)": f"{project_sv:.2f} SAR",
+        "Cost Variance (CV)": f"{project_cv:.2f} SAR",
         "SPI": f"{project_spi:.2f}",
         "CPI": f"{project_cpi:.2f}"
     }
