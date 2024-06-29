@@ -457,13 +457,14 @@ with tab2:
     # Fill NaN values with 0 after conversion
     filtered_df.fillna(0, inplace=True)
 
+    # Calculate EVM metrics for each task and for the project as a whole
     for index, row in filtered_df.iterrows():
-        filtered_df.loc[index, 'EV'] = row['Budget'] * (row['Percent Complete'] / 100)
-        filtered_df.loc[index, 'SV'] = row['EV'] - row['Budget']  # Using Budget as PV
-        filtered_df.loc[index, 'CV'] = row['EV'] - row['Actual Cost']
-        # Avoid division by zero
-        filtered_df.loc[index, 'SPI'] = row['EV'] / row['Budget'] if row['Budget'] != 0 else 0
-        filtered_df.loc[index, 'CPI'] = row['EV'] / row['Actual Cost'] if row['Actual Cost'] != 0 else 0
+        ev = row['Budget'] * (row['Percent Complete'] / 100)
+        filtered_df.loc[index, 'EV'] = ev  # Assign 'EV' first
+        filtered_df.loc[index, 'SV'] = ev - row['Budget']
+        filtered_df.loc[index, 'CV'] = ev - row['Actual Cost']
+        filtered_df.loc[index, 'SPI'] = ev / row['Budget'] if row['Budget'] != 0 else 0
+        filtered_df.loc[index, 'CPI'] = ev / row['Actual Cost'] if row['Actual Cost'] != 0 else 0
 
     # Calculate Project Level EVM metrics AFTER the loop
     total_pv = filtered_df['Budget'].sum()  # Using Budget for PV
@@ -473,7 +474,7 @@ with tab2:
     project_cv = total_ev - total_ac
     project_spi = total_ev / total_pv if total_pv != 0 else 0
     project_cpi = total_ev / total_ac if total_ac != 0 else 0
-
+    
     # Display EVM metrics (Now that project_sv, etc. are defined)
     col1, col2, col3, col4 = st.columns(4)
     with col1:
