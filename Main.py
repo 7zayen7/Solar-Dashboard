@@ -472,29 +472,52 @@ with tab2:
     project_spi = total_ev / total_pv if total_pv != 0 else 0
     project_cpi = total_ev / total_ac if total_ac != 0 else 0
 
-    # CSS to force black background and white text color
+    # EVM Metrics Display
+    st.subheader("Earned Value Management (EVM)")
+
+    # Create a dictionary to store EVM metrics
+    evm_metrics = {
+        "Schedule Variance (SV)": f"{project_sv:.2f} SAR",
+        "Cost Variance (CV)": f"{project_cv:.2f} SAR",
+        "SPI": f"{project_spi:.2f}",
+        "CPI": f"{project_cpi:.2f}"
+    }
+
+    # Style the EVM metrics display
     st.markdown(
         """
         <style>
-        div[data-testid="metric-container"] {
-            background-color: black !important; 
-            color: white !important;
-            border: none !important;
+        .evm-metric {
+            background-color: black;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .evm-metric-label {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .evm-metric-value {
+            font-size: 24px;
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
-    # ... Display EVM metrics (Now that project_sv, etc. are defined)
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric(label="Schedule Variance (SV)", value=f"{project_sv:.2f}")
-    with col2:
-        st.metric(label="Cost Variance (CV)", value=f"{project_cv:.2f}")
-    with col3:
-        st.metric(label="SPI", value=f"{project_spi:.2f}")
-    with col4:
-        st.metric(label="CPI", value=f"{project_cpi:.2f}")
+
+    # Display EVM metrics using st.markdown
+    for label, value in evm_metrics.items():
+        st.markdown(
+            f"""
+            <div class="evm-metric">
+                <div class="evm-metric-label">{label}</div>
+                <div class="evm-metric-value">{value}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     # Display EVM metrics table per task
     st.subheader("EVM Metrics per Task")
