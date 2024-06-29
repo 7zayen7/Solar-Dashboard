@@ -17,8 +17,6 @@ import contextlib
 import io
 from io import StringIO
 import uuid
-from contextlib import redirect_stdout
-
 
 # --- Add Logo ---
 col1, col2 = st.columns(2)
@@ -65,7 +63,6 @@ class FileChangeHandler(FileSystemEventHandler):
         if event.src_path == os.path.abspath(EXCEL_FILENAME):
             st.session_state.df = load_and_process_data()
             st.experimental_rerun()  # Refresh the app
-
 
 # --- Function to open Excel file ---
 def edit_excel_file():
@@ -115,19 +112,15 @@ def generate_pdf_report(filtered_df):
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
-        <style>
-            /* Add CSS for styling if desired */
-            table {{
-                border-collapse: collapse;
-                width: 100%;
-            }}
-            th, td {{
-                border: 1px solid #dddddd;
-                text-align: left;
-                padding: 8px;
-            }}
-        </style>
+      <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
+      <style>
+        /* Add your CSS styling here */
+        body {{ font-family: sans-serif; color: #333; }}
+        h1, h2 {{ color: #007bff; }} /* Blue headings */
+        table {{ border-collapse: collapse; width: 100%; }}
+        th, td {{ border: 1px solid #ccc; padding: 8px; }}
+        th {{ background-color: #f0f0f0; }}
+      </style>
     </head>
     <body>
         <h1>Project Report - NEOM Bay Airport</h1>
@@ -155,7 +148,7 @@ def generate_pdf_report(filtered_df):
     }
     pdf = pdfkit.from_string(html_string, False, options=options)  # Remove config
     return pdf
-    
+
 # --- Refresh Function ---
 def refresh_data():
     st.session_state.df = load_and_process_data()
