@@ -112,15 +112,19 @@ def generate_pdf_report(filtered_df):
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
-      <style>
-        /* Add your CSS styling here */
-        body {{ font-family: sans-serif; color: #333; }}
-        h1, h2 {{ color: #007bff; }} /* Blue headings */
-        table {{ border-collapse: collapse; width: 100%; }}
-        th, td {{ border: 1px solid #ccc; padding: 8px; }}
-        th {{ background-color: #f0f0f0; }}
-      </style>
+        <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
+        <style>
+            /* CSS for Styling */
+            body {{ font-family: sans-serif; color: #333; }}
+            h1, h2 {{ color: #007bff; }} /* Blue headings */
+            table {{ border-collapse: collapse; width: 100%; }}
+            th, td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
+            th {{ background-color: #f0f0f0; }} 
+            .alert {{ padding: 10px; margin-bottom: 10px; border-radius: 5px; }}
+            .alert-warning {{ background-color: #fff3cd; border-color: #ffeeba; color: #856404; }}
+            .alert-danger {{ background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }}
+            .alert-success {{ background-color: #d4edda; border-color: #c3e6cb; color: #155724; }}
+        </style>
     </head>
     <body>
         <h1>Project Report - NEOM Bay Airport</h1>
@@ -132,10 +136,14 @@ def generate_pdf_report(filtered_df):
         {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
 
         <h2>Gantt Chart</h2>
-        <img src='data:image/png;base64,{base64.b64encode(px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category").to_image(format="png")).decode()}' />
+        <img src='data:image/png;base64,{base64.b64encode(create_gantt_chart(filtered_df)).decode()}' />
+
+        <h2>Cost Variance Alerts</h2>
+        {generate_cost_variance_alerts(filtered_df)} 
     </body>
     </html>
     """
+
 
     options = {
         'page-size': 'Letter',
@@ -146,8 +154,31 @@ def generate_pdf_report(filtered_df):
         'encoding': "UTF-8",
         'no-outline': None
     }
-    pdf = pdfkit.from_string(html_string, False, options=options)  # Remove config
+    pdf = pdfkit.from_string(html_string, False, options=options)
     return pdf
+
+def create_gantt_chart(df):
+    fig = px.timeline(df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
+    fig.update_layout(
+        plot_bgcolor="white",
+        paper_bgcolor="white"
+    )
+    fig.update_traces(marker=dict(line=dict(width=2, color='DarkSlateGrey')))
+    fig.update_yaxes(autorange="reversed")
+    return fig.to_image(format="png")
+
+def generate_cost_variance_alerts(df):
+    alerts_html = ""
+    for _, row in df.iterrows():
+        task_name = row['Task']
+        cost_variance = row['Cost Variance']
+        if cost_variance == 0:
+            alerts_html += f'<div class="alert alert-warning">⚠️ Task "{task_name}" has consumed its entire budget.</div>'
+        elif cost_variance < 0:
+            alerts_html += f'<div class="alert alert-danger">🚨 Task "{task_name}" has exceeded its budget by ${-cost_variance}.</div>'
+        else:
+            alerts_html += f'<div class="alert alert-success">✅ Task "{task_name}" has saved ${cost_variance} of its budget.</div>'
+    return alerts_html
 
 # --- Refresh Function ---
 def refresh_data():
