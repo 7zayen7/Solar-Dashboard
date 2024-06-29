@@ -197,7 +197,7 @@ def generate_task_progress_table(df):
         if percent_complete < 100 and end_date < datetime.datetime.now():
             status = "⚠️ Overdue"
             alert_class = "alert-danger"
-        elif percent_complete < 100:
+        elif 0 < percent_complete < 100:
             status = "🚧 In Progress"
             alert_class = "alert-warning"
         elif percent_complete == 0:
