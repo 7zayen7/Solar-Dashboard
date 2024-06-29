@@ -18,6 +18,10 @@ import io
 from io import StringIO
 import uuid
 
+# --- Configuration for wkhtmltopdf ---
+path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Replace with your actual path
+config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
@@ -134,9 +138,11 @@ def generate_pdf_report(filtered_df):
 
         <h2>Financial Details</h2>
         {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
-
+        
         <h2>Gantt Chart</h2>
-        <img src='data:image/png;base64,{base64.b64encode(create_gantt_chart(filtered_df)).decode()}' />
+        <div style="display: flex; justify-content: center; align-items: center;"> 
+        <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_gantt_chart(filtered_df)).decode()}' />
+        </div>
 
         <h2>Cost Variance Alerts</h2>
         {generate_cost_variance_alerts(filtered_df)} 
@@ -160,7 +166,7 @@ def generate_pdf_report(filtered_df):
 def create_gantt_chart(df):
     # Define a color map for each unique category
     unique_categories = df['Category'].unique()
-    color_map = {category: px.colors.qualitative.Plotly[i % len(px.colors.qualitative.Plotly)] 
+    color_map = {category: px.colors.qualitative.Plotly[i % len(px.colors.qualitative.Plotly)]
                  for i, category in enumerate(unique_categories)}
 
     # Create the Gantt chart
@@ -175,8 +181,12 @@ def create_gantt_chart(df):
     fig.update_traces(marker=dict(line=dict(width=2, color='DarkSlateGrey')))
     fig.update_yaxes(autorange="reversed")
 
-    return fig.to_image(format="png")
+    fig.update_layout(
+        width=1000,  # Adjust the width as needed
+        height=600   # Adjust the height as needed
+    )
 
+    return fig.to_image(format="png")
 def generate_cost_variance_alerts(df):
     alerts_html = ""
     for _, row in df.iterrows():
