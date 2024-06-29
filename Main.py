@@ -35,7 +35,7 @@ with col1:
 
     logo_path = "dt arabic logo .png"
     with st.container():  # Use the container for centering
-        st.image(logo_path, width=300)
+        st.image(logo_path, width=200)
 
 with col2:
     st.markdown(
@@ -52,10 +52,11 @@ with col2:
 
     logo_path = "Neom.png"
     with st.container():  # Use the container for centering
-        st.image(logo_path, width=100)
+        st.image(logo_path, width=200)
 
 # --- Constants ---
 EXCEL_FILENAME = 'solar_project_data.xlsx'
+
 
 # --- File Watcher (Optional) ---
 class FileChangeHandler(FileSystemEventHandler):
@@ -64,10 +65,12 @@ class FileChangeHandler(FileSystemEventHandler):
             st.session_state.df = load_and_process_data()
             st.experimental_rerun()  # Refresh the app
 
+
 # --- Function to open Excel file ---
 def edit_excel_file():
     file_path = os.path.abspath(EXCEL_FILENAME)
     webbrowser.open(file_path)
+
 
 # --- Data Loading and Processing ---
 def load_and_process_data(filename='solar_project_data.xlsx'):
@@ -82,10 +85,11 @@ def load_and_process_data(filename='solar_project_data.xlsx'):
         st.error(f"Error: File '{filename}' not found. Make sure it's in the same directory as this script.")
         st.stop()
 
+
 # --- Session State Initialization ---
 if 'df' not in st.session_state:
     st.session_state.df = load_and_process_data()
-df=st.session_state.df
+df = st.session_state.df
 
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
@@ -101,7 +105,8 @@ filtered_df = st.session_state.df[
     (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
     (st.session_state.df['Start Date'].dt.date >= start_date) &
     (st.session_state.df['End Date'].dt.date <= end_date)
-]
+    ]
+
 
 # --- Report Generation ---
 def generate_pdf_report(filtered_df):
@@ -134,18 +139,26 @@ def generate_pdf_report(filtered_df):
 
         <h2>Financial Details</h2>
         {filtered_df[['Task', 'Budget', 'Actual Cost', 'Cost Variance']].to_html(index=False)}
-        
+
         <h2>Gantt Chart</h2>
-        <div style="display: flex; justify-content: center; align-items: center;"> 
-        <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_gantt_chart(filtered_df)).decode()}' />
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_gantt_chart(filtered_df)).decode()}' />
         </div>
 
-        <h2>Cost Variance Alerts</h2>
-        {generate_cost_variance_alerts(filtered_df)} 
+        <h2>Cost Comparison Chart</h2>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_cost_comparison_chart(filtered_df)).decode()}' />
+        </div>
+
+        <h2>Budget Allocation Chart</h2>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_budget_allocation_chart(filtered_df)).decode()}' />
+        </div>
+       <h2>Cost Variance Alerts</h2>
+        {generate_cost_variance_alerts(filtered_df)}
     </body>
     </html>
     """
-
 
     options = {
         'page-size': 'Letter',
@@ -158,6 +171,7 @@ def generate_pdf_report(filtered_df):
     }
     pdf = pdfkit.from_string(html_string, False, options=options)
     return pdf
+
 
 def create_gantt_chart(df):
     # Define a color map for each unique category
@@ -179,10 +193,12 @@ def create_gantt_chart(df):
 
     fig.update_layout(
         width=1000,  # Adjust the width as needed
-        height=700   # Adjust the height as needed
+        height=600  # Adjust the height as needed
     )
 
     return fig.to_image(format="png")
+
+
 def generate_cost_variance_alerts(df):
     alerts_html = ""
     for _, row in df.iterrows():
@@ -196,12 +212,32 @@ def generate_cost_variance_alerts(df):
             alerts_html += f'<div class="alert alert-success">✅ Task "{task_name}" has saved ${cost_variance} of its budget.</div>'
     return alerts_html
 
+# Function to create the cost comparison bar chart
+def create_cost_comparison_chart(df):
+    cost_df = df.melt(id_vars='Task', value_vars=['Budget', 'Actual Cost'])
+    fig = px.bar(cost_df, x='Task', y='value', color='variable', barmode='group', title='Cost Comparison')
+    fig.update_layout(
+        plot_bgcolor="white",
+        paper_bgcolor="white"
+    )
+    return fig.to_image(format="png")
+
+# Function to create the budget allocation pie chart
+def create_budget_allocation_chart(df):
+    fig = px.pie(df, values='Budget', names='Category', title='Budget Allocation')
+    fig.update_layout(
+        plot_bgcolor="white",
+        paper_bgcolor="white"
+    )
+    return fig.to_image(format="png")
+
 # --- Refresh Function ---
 def refresh_data():
     st.session_state.df = load_and_process_data()
 
+
 # --- Refresh Button and Edit Button ---
-col1, col2= st.columns(2)
+col1, col2 = st.columns(2)
 with col1:
     st.button("Refresh Data", on_click=refresh_data)  # Pass the function
 with col2:
@@ -218,7 +254,6 @@ if not st.session_state.df.empty:
     st.write(f"**End Date:** {st.session_state.df['End Date'].max().date()}")
 else:
     st.warning("No data found. Please check the Excel file.")
-
 
 # --- Dashboard with Tabs ---
 tab1, tab2, tab3 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management"])
@@ -267,7 +302,7 @@ with tab1:
     # Gantt Chart with Task Progress
     st.subheader("Project Timeline")
     fig_gantt = px.timeline(filtered_df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
-    fig_gantt.update_yaxes(autorange="reversed") # Update the fig_gantt before using it
+    fig_gantt.update_yaxes(autorange="reversed")  # Update the fig_gantt before using it
     st.plotly_chart(fig_gantt, use_container_width=True)
 
     # Individual Task Progress Bars with Percentages and Alerts
@@ -361,7 +396,8 @@ with tab3:
         'Risk': ['Material delays', 'Weather disruptions', 'Permitting issues', 'Labor shortage'],
         'Probability': ['Medium', 'High', 'Low', 'Medium'],
         'Impact': ['High', 'Medium', 'Medium', 'Low'],
-        'Mitigation Plan': ['Secure backup suppliers', 'Contingency schedule', 'Proactive communication', 'Cross-training']
+        'Mitigation Plan': ['Secure backup suppliers', 'Contingency schedule', 'Proactive communication',
+                            'Cross-training']
     }
 
     st.table(pd.DataFrame(risk_data))
@@ -387,7 +423,7 @@ if st.sidebar.button("Download PDF Report"):
 
 # --- Key Metrics Summary ---
 st.subheader("Key Metrics")
-st.write(f"**Total Tasks:** {len(st.session_state.df)}")  #Access df from the session state
+st.write(f"**Total Tasks:** {len(st.session_state.df)}")  # Access df from the session state
 st.write(f"**Tasks Completed:** {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}")
 
 if not filtered_df.empty:
