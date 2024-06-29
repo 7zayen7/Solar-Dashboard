@@ -54,6 +54,47 @@ with col2:
     with st.container():  # Use the container for centering
         st.image(logo_path, width=100)
 
+# --- Sidebar Customization ---
+st.sidebar.header("Customize Dashboard")
+
+# Color Scheme
+selected_theme = st.sidebar.selectbox("Theme", ["Light", "Dark", "Custom"])
+
+if selected_theme == "Custom":
+    primary_color = st.sidebar.color_picker("Primary Color")
+    background_color = st.sidebar.color_picker("Background Color")
+    # ... (Add more color pickers for other elements)
+
+# Layout
+selected_layout = st.sidebar.selectbox("Layout", ["Single Column", "Two Columns"])
+
+# --- Apply Customization ---
+
+# Theme
+if selected_theme == "Light":
+    # Apply light theme styles (using st.markdown with custom CSS)
+elif selected_theme == "Dark":
+    # Apply dark theme styles (using st.markdown with custom CSS)
+elif selected_theme == "Custom":
+    st.markdown(
+        f"""
+        <style>
+            .stApp {{
+                background-color: {background_color};
+                color: {primary_color};
+            }}
+            /* ... (Style other elements using primary_color and background_color) */
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+# Layout
+if selected_layout == "Single Column":
+    # Use st.container() or st.columns(1) for single-column layout
+elif selected_layout == "Two Columns":
+    # Use st.columns(2) for two-column layout
+
 # --- Constants ---
 EXCEL_FILENAME = 'solar_project_data.xlsx'
 
