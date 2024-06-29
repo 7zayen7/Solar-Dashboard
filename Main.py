@@ -240,7 +240,7 @@ def create_gantt_chart(df):
     fig.update_yaxes(autorange="reversed")
 
     fig.update_layout(
-        width=1200,  # Adjust the width as needed
+        width=1500,  # Adjust the width as needed
         height=800  # Adjust the height as needed
     )
 
@@ -270,7 +270,7 @@ def create_cost_comparison_chart(df):
         paper_bgcolor="white"
     )
     fig.update_layout(
-        width=1200,  # Adjust the width as needed
+        width=1500,  # Adjust the width as needed
         height=600  # Adjust the height as needed
     )
     return fig.to_image(format="png")
@@ -284,7 +284,7 @@ def create_budget_allocation_chart(df):
         paper_bgcolor="white"
     )
     fig.update_layout(
-        width=1200,  # Adjust the width as needed
+        width=1500,  # Adjust the width as needed
         height=600  # Adjust the height as needed
     )
     return fig.to_image(format="png")
