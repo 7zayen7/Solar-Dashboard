@@ -472,9 +472,6 @@ with tab2:
     project_spi = total_ev / total_pv if total_pv != 0 else 0
     project_cpi = total_ev / total_ac if total_ac != 0 else 0
 
-    # EVM Metrics Display
-    st.subheader("Earned Value Management (EVM)")
-
     # Create a dictionary to store EVM metrics
     evm_metrics = {
         "Schedule Variance (SV)": f"{project_sv:.2f} SAR",
