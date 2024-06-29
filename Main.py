@@ -144,6 +144,21 @@ def generate_pdf_report(filtered_df):
         <div style="display: flex; justify-content: center; align-items: center;">
             <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_gantt_chart(filtered_df)).decode()}' />
         </div>
+        
+        <h2>Task Progress</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {generate_task_progress_table(filtered_df)}
+            </tbody>
+        </table>
 
         <h2>Cost Comparison Chart</h2>
         <div style="display: flex; justify-content: center; align-items: center;">
@@ -172,6 +187,36 @@ def generate_pdf_report(filtered_df):
     pdf = pdfkit.from_string(html_string, False, options=options)
     return pdf
 
+def generate_task_progress_table(df):
+    table_rows = ""
+    for _, row in df.iterrows():
+        task_name = row['Task']
+        percent_complete = row['Percent Complete']
+        end_date = row['End Date']
+
+        if percent_complete < 100 and end_date < datetime.datetime.now():
+            status = "⚠️ Overdue"
+            alert_class = "alert-danger"
+        elif percent_complete < 100:
+            status = "🚧 In Progress"
+            alert_class = "alert-warning"
+        else:
+            status = "✅ Completed"
+            alert_class = "alert-success"
+
+        table_rows += f"""
+        <tr>
+            <td>{task_name}</td>
+            <td>
+                <div style="background-color: #eee; border-radius: 5px;">
+                    <div style="background-color: #4CAF50; width: {percent_complete}%; height: 20px; border-radius: 5px;"></div>
+                </div> 
+                <span>{percent_complete:.1f}%</span>
+            </td>
+            <td><div class="alert {alert_class}">{status}</div></td>
+        </tr>
+        """
+    return table_rows
 
 def create_gantt_chart(df):
     # Define a color map for each unique category
