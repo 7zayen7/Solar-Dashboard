@@ -468,15 +468,14 @@ if st.sidebar.button("Download PDF Report"):
     if filtered_df.empty:
         st.sidebar.warning("No data to include in the report. Apply filters to select data.")
     else:
-        pdf_report = generate_pdf_report(filtered_df)
-        # Download report button with a unique file name
+        pdf_report = generate_pdf_report(filtered_df, primary_color, heading_font, body_font)
         st.sidebar.download_button(
             label="Download PDF Report",
             data=pdf_report,
             file_name=f"NEOM_Bay_Airport_Report_{datetime.datetime.now().strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf",
         )
-
+        
 # --- Key Metrics Summary ---
 st.subheader("Key Metrics")
 st.write(f"**Total Tasks:** {len(st.session_state.df)}")  # Access df from the session state
