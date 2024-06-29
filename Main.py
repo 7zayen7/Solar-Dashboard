@@ -106,17 +106,11 @@ filtered_df = st.session_state.df[
     (st.session_state.df['End Date'].dt.date <= end_date)
     ]
 
-# --- Report Generation Settings ---
-st.sidebar.subheader("Report Customization")
-primary_color = st.sidebar.color_picker("Primary Color", "#007bff")  # Default is blue
-heading_font = st.sidebar.selectbox("Heading Font", ["sans-serif", "serif", "monospace"], index=0)
-body_font = st.sidebar.selectbox("Body Font", ["sans-serif", "serif", "monospace"], index=0)
-
 # --- Report Generation ---
-def generate_pdf_report(filtered_df, primary_color, heading_font, body_font):
+def generate_pdf_report(filtered_df):
     """Generates a PDF report from the filtered DataFrame."""
 
-    # Create HTML content with the filtered data and the specified styling
+    # Create HTML content with the filtered data and any desired formatting
     html_string = f"""
     <!DOCTYPE html>
     <html>
@@ -124,9 +118,15 @@ def generate_pdf_report(filtered_df, primary_color, heading_font, body_font):
         <title>Project Report - {datetime.datetime.now().strftime('%Y-%m-%d')}</title>
         <style>
             /* CSS for Styling */
-            body {{ font-family: {body_font}; color: #333; }}
-            h1, h2 {{ color: {primary_color}; font-family: {heading_font}; }} 
-            /* ... other CSS styles for table, alerts, etc. */
+            body {{ font-family: sans-serif; color: #333; }}
+            h1, h2 {{ color: #007bff; }} /* Blue headings */
+            table {{ border-collapse: collapse; width: 100%; }}
+            th, td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
+            th {{ background-color: #f0f0f0; }} 
+            .alert {{ padding: 10px; margin-bottom: 10px; border-radius: 5px; }}
+            .alert-warning {{ background-color: #fff3cd; border-color: #ffeeba; color: #856404; }}
+            .alert-danger {{ background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }}
+            .alert-success {{ background-color: #d4edda; border-color: #c3e6cb; color: #155724; }}
         </style>
     </head>
     <body>
@@ -468,14 +468,15 @@ if st.sidebar.button("Download PDF Report"):
     if filtered_df.empty:
         st.sidebar.warning("No data to include in the report. Apply filters to select data.")
     else:
-        pdf_report = generate_pdf_report(filtered_df, primary_color, heading_font, body_font)
+        pdf_report = generate_pdf_report(filtered_df)
+        # Download report button with a unique file name
         st.sidebar.download_button(
             label="Download PDF Report",
             data=pdf_report,
             file_name=f"NEOM_Bay_Airport_Report_{datetime.datetime.now().strftime('%Y-%m-%d')}.pdf",
             mime="application/pdf",
         )
-        
+
 # --- Key Metrics Summary ---
 st.subheader("Key Metrics")
 st.write(f"**Total Tasks:** {len(st.session_state.df)}")  # Access df from the session state
