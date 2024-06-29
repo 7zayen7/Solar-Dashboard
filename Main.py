@@ -215,19 +215,29 @@ def generate_cost_variance_alerts(df):
 # Function to create the cost comparison bar chart
 def create_cost_comparison_chart(df):
     cost_df = df.melt(id_vars='Task', value_vars=['Budget', 'Actual Cost'])
-    fig = px.bar(cost_df, x='Task', y='value', color='variable', barmode='group', title='Cost Comparison')
+    fig = px.bar(cost_df, x='Task', y='value', color='variable', barmode='group', title='Cost Comparison',
+                 color_discrete_sequence=px.colors.qualitative.Plotly)  # Add color sequence
     fig.update_layout(
         plot_bgcolor="white",
         paper_bgcolor="white"
+    )
+    fig.update_layout(
+        width=1000,  # Adjust the width as needed
+        height=600  # Adjust the height as needed
     )
     return fig.to_image(format="png")
 
 # Function to create the budget allocation pie chart
 def create_budget_allocation_chart(df):
-    fig = px.pie(df, values='Budget', names='Category', title='Budget Allocation')
+    fig = px.pie(df, values='Budget', names='Category', title='Budget Allocation',
+                 color_discrete_sequence=px.colors.qualitative.Plotly)  # Add color sequence
     fig.update_layout(
         plot_bgcolor="white",
         paper_bgcolor="white"
+    )
+    fig.update_layout(
+        width=1000,  # Adjust the width as needed
+        height=600  # Adjust the height as needed
     )
     return fig.to_image(format="png")
 
