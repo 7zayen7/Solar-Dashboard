@@ -70,14 +70,16 @@ if selected_layout == "Single Column":
     # Use st.container() or st.columns(1) for single-column layout
     st.write("This is a single-column layout") # Placeholder, replace with your actual content
 
-elif selected_layout == "Two Columns":  # This elif block needs indentation
+elif selected_layout == "Two Columns":  
     # Use st.columns(2) for two-column layout
     col1, col2 = st.columns(2)
     with col1:
         st.write("This is the first column")
     with col2:
         st.write("This is the second column")
-
+else:
+    st.error("Invalid layout selection")
+    
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
