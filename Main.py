@@ -447,49 +447,47 @@ with tab2:
     st.subheader("Earned Value Management (EVM)")
 
     # EVM Calculations (with Error Handling)
-    # EVM Calculations (with Error Handling and Project Level Metrics)
+    # EVM Calculations (using 'Budget' as Planned Value)
     st.subheader("Earned Value Management (EVM)")
 
-    if 'Planned Value' not in filtered_df.columns:
-        st.error("Error: 'Planned Value' column not found in the data. Please check the Excel file.")
-    else:
-        for index, row in filtered_df.iterrows():
-            filtered_df.loc[index, 'EV'] = row['Budget'] * (row['Percent Complete'] / 100)
-            filtered_df.loc[index, 'SV'] = row['EV'] - row['Planned Value']
-            filtered_df.loc[index, 'CV'] = row['EV'] - row['Actual Cost']
-            # Ensure the denominators in SPI and CPI calculations are not zero
-            if row['Planned Value'] != 0: 
-                filtered_df.loc[index, 'SPI'] = row['EV'] / row['Planned Value']
-            else:
-                filtered_df.loc[index, 'SPI'] = 0  # or some other appropriate value
-            if row['Actual Cost'] != 0:
-                filtered_df.loc[index, 'CPI'] = row['EV'] / row['Actual Cost']
-            else:
-                filtered_df.loc[index, 'CPI'] = 0  # or some other appropriate value
+    # Convert relevant columns to numeric (important!)
+    for col in ['Budget', 'Actual Cost', 'Percent Complete']:
+        filtered_df[col] = pd.to_numeric(filtered_df[col], errors='coerce')
 
-        # Calculate Project Level EVM metrics AFTER the loop
-        total_pv = filtered_df['Planned Value'].sum()
-        total_ev = filtered_df['EV'].sum()
-        total_ac = filtered_df['Actual Cost'].sum()
-        project_sv = total_ev - total_pv
-        project_cv = total_ev - total_ac
-        project_spi = total_ev / total_pv if total_pv != 0 else 0
-        project_cpi = total_ev / total_ac if total_ac != 0 else 0
+    # Fill NaN values with 0 after conversion
+    filtered_df.fillna(0, inplace=True)
 
-        # Display EVM metrics (Now that project_sv, etc. are defined)
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric(label="Schedule Variance (SV)", value=f"{project_sv:.2f}")
-        with col2:
-            st.metric(label="Cost Variance (CV)", value=f"{project_cv:.2f}")
-        with col3:
-            st.metric(label="SPI", value=f"{project_spi:.2f}")
-        with col4:
-            st.metric(label="CPI", value=f"{project_cpi:.2f}")
+    for index, row in filtered_df.iterrows():
+        filtered_df.loc[index, 'EV'] = row['Budget'] * (row['Percent Complete'] / 100)
+        filtered_df.loc[index, 'SV'] = row['EV'] - row['Budget']  # Using Budget as PV
+        filtered_df.loc[index, 'CV'] = row['EV'] - row['Actual Cost']
+        # Avoid division by zero
+        filtered_df.loc[index, 'SPI'] = row['EV'] / row['Budget'] if row['Budget'] != 0 else 0
+        filtered_df.loc[index, 'CPI'] = row['EV'] / row['Actual Cost'] if row['Actual Cost'] != 0 else 0
+
+    # Calculate Project Level EVM metrics AFTER the loop
+    total_pv = filtered_df['Budget'].sum()  # Using Budget for PV
+    total_ev = filtered_df['EV'].sum()
+    total_ac = filtered_df['Actual Cost'].sum()
+    project_sv = total_ev - total_pv
+    project_cv = total_ev - total_ac
+    project_spi = total_ev / total_pv if total_pv != 0 else 0
+    project_cpi = total_ev / total_ac if total_ac != 0 else 0
+
+    # Display EVM metrics (Now that project_sv, etc. are defined)
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        st.metric(label="Schedule Variance (SV)", value=f"{project_sv:.2f}")
+    with col2:
+        st.metric(label="Cost Variance (CV)", value=f"{project_cv:.2f}")
+    with col3:
+        st.metric(label="SPI", value=f"{project_spi:.2f}")
+    with col4:
+        st.metric(label="CPI", value=f"{project_cpi:.2f}")
 
     # Display EVM metrics table per task
     st.subheader("EVM Metrics per Task")
-    st.table(filtered_df[['Task', 'PV', 'EV', 'AC', 'SV', 'CV', 'SPI', 'CPI']])
+    st.table(filtered_df[['Task', 'Budget', 'EV', 'Actual Cost', 'SV', 'CV', 'SPI', 'CPI']])  # Display 'Budget'
 
     # EVM Trend Charts
     st.subheader("EVM Trends Over Time")
@@ -514,7 +512,7 @@ with tab2:
     st.subheader("SPI and CPI Trends")
     spi_cpi_trend = px.line(filtered_df, x='Start Date', y=['SPI', 'CPI'], title='SPI and CPI Trends')
     st.plotly_chart(spi_cpi_trend)
-    
+
 with tab3:
     # --- Risk Management ---
     st.subheader("Risk Management")
