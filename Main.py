@@ -286,6 +286,55 @@ def create_budget_allocation_chart(df):
         height=800  # Adjust the height as needed
     )
     return fig.to_image(format="png")
+    # EVM Metrics Section (Added)
+    evm_section = """
+    <h2>Earned Value Management (EVM) Metrics</h2>
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">  
+    """
+
+    for metric, value in evm_metrics.items():
+        evm_section += f"""
+        <div style="background-color: black; color: white; padding: 15px; border-radius: 5px; text-align: center; margin: 5px;">
+            <div style="font-weight: bold; font-size: 18px;">{metric}</div>
+            <div style="font-size: 24px;">{value}</div>
+        </div>
+        """
+
+    evm_section += """</div><br>"""
+
+    evm_section += f"""
+    <h3>EVM Metrics per Task</h3>
+    <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+        <thead>
+            <tr>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Task</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Budget</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">EV</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Actual Cost</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">SV</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CV</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">SPI</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">CPI</th>
+            </tr>
+        </thead>
+        <tbody>
+    """
+    for _, row in filtered_df.iterrows():
+        evm_section += f"""
+        <tr>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["Task"]}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["Budget"]:.2f}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["EV"]:.2f}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["Actual Cost"]:.2f}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["SV"]:.2f}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["CV"]:.2f}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["SPI"]:.2f}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">{row["CPI"]:.2f}</td>
+        </tr>
+        """
+    evm_section += """</tbody>
+    </table>
+    """
 
 # --- Refresh Function ---
 def refresh_data():
