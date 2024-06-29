@@ -35,7 +35,7 @@ with col1:
 
     logo_path = "dt arabic logo .png"
     with st.container():  # Use the container for centering
-        st.image(logo_path, width=200)
+        st.image(logo_path, width=300)
 
 with col2:
     st.markdown(
@@ -52,7 +52,7 @@ with col2:
 
     logo_path = "Neom.png"
     with st.container():  # Use the container for centering
-        st.image(logo_path, width=200)
+        st.image(logo_path, width=100)
 
 # --- Constants ---
 EXCEL_FILENAME = 'solar_project_data.xlsx'
