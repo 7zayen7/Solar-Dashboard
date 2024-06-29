@@ -35,7 +35,7 @@ with col1:
 
     logo_path = "dt arabic logo .png"
     with st.container():  # Use the container for centering
-        st.image(logo_path, width=200)
+        st.image(logo_path, width=50)
 
 with col2:
     st.markdown(
