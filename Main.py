@@ -474,7 +474,7 @@ with tab2:
     project_cv = total_ev - total_ac
     project_spi = total_ev / total_pv if total_pv != 0 else 0
     project_cpi = total_ev / total_ac if total_ac != 0 else 0
-    
+
     # Display EVM metrics (Now that project_sv, etc. are defined)
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -493,13 +493,13 @@ with tab2:
     # EVM Trend Charts
     st.subheader("EVM Trends Over Time")
 
-    # Prepare data for trend charts
-    trend_df = filtered_df[['Start Date', 'Planned Value', 'EV', 'Actual Cost']].copy()
-    trend_df = trend_df.melt(id_vars='Start Date', value_vars=['Planned Value', 'EV', 'Actual Cost'], var_name='Metric', value_name='Cost')
+    # Prepare data for trend charts (using 'Budget' instead of 'Planned Value')
+    trend_df = filtered_df[['Start Date', 'Budget', 'EV', 'Actual Cost']].copy()  # Replace 'Planned Value' with 'Budget'
+    trend_df = trend_df.melt(id_vars='Start Date', value_vars=['Budget', 'EV', 'Actual Cost'], var_name='Metric', value_name='Cost')
 
-    # SV Trend Chart
+    # SV Trend Chart (replace 'Planned Value' with 'Budget')
     st.subheader("Schedule Variance (SV) Trend")
-    sv_trend = px.line(trend_df[trend_df['Metric'].isin(['Planned Value', 'EV'])], x='Start Date', y='Cost', color='Metric',
+    sv_trend = px.line(trend_df[trend_df['Metric'].isin(['Budget', 'EV'])], x='Start Date', y='Cost', color='Metric',
                        title='Schedule Variance Trend')
     st.plotly_chart(sv_trend)
 
