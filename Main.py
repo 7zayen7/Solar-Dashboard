@@ -18,42 +18,6 @@ import io
 from io import StringIO
 import uuid
 
-# --- Add Logo ---
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown(
-        """
-        <style>
-        .logo-container {  # Add a container for the image
-            display: flex;
-            justify-content: center;  # Center horizontally
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    logo_path = "dt arabic logo .png"
-    with st.container():  # Use the container for centering
-        st.image(logo_path, width=300)
-
-with col2:
-    st.markdown(
-        """
-        <style>
-        .logo-container {  # Add a container for the image
-            display: flex;
-            justify-content: center;  # Center horizontally
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    logo_path = "Neom.png"
-    with st.container():  # Use the container for centering
-        st.image(logo_path, width=100)
-
 # --- Sidebar Customization ---
 st.sidebar.header("Customize Dashboard")
 
@@ -94,6 +58,42 @@ if selected_layout == "Single Column":
     # Use st.container() or st.columns(1) for single-column layout
 elif selected_layout == "Two Columns":
     # Use st.columns(2) for two-column layout
+
+# --- Add Logo ---
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown(
+        """
+        <style>
+        .logo-container {  # Add a container for the image
+            display: flex;
+            justify-content: center;  # Center horizontally
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    logo_path = "dt arabic logo .png"
+    with st.container():  # Use the container for centering
+        st.image(logo_path, width=300)
+
+with col2:
+    st.markdown(
+        """
+        <style>
+        .logo-container {  # Add a container for the image
+            display: flex;
+            justify-content: center;  # Center horizontally
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    logo_path = "Neom.png"
+    with st.container():  # Use the container for centering
+        st.image(logo_path, width=100)
 
 # --- Constants ---
 EXCEL_FILENAME = 'solar_project_data.xlsx'
