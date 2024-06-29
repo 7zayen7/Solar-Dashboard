@@ -478,13 +478,13 @@ with tab2:
     # Display EVM metrics (Now that project_sv, etc. are defined)
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric(label="Schedule Variance (SV)", value=f"{project_sv:.2f}")
+        st.metric(label="Schedule Variance (SV)", value=f"{project_sv:.2f}", delta_color="inverse")
     with col2:
-        st.metric(label="Cost Variance (CV)", value=f"{project_cv:.2f}")
+        st.metric(label="Cost Variance (CV)", value=f"{project_cv:.2f}", delta_color="inverse")
     with col3:
-        st.metric(label="SPI", value=f"{project_spi:.2f}")
+        st.metric(label="SPI", value=f"{project_spi:.2f}", delta_color="inverse")
     with col4:
-        st.metric(label="CPI", value=f"{project_cpi:.2f}")
+        st.metric(label="CPI", value=f"{project_cpi:.2f}", delta_color="inverse")
 
     # Display EVM metrics table per task
     st.subheader("EVM Metrics per Task")
