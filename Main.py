@@ -194,23 +194,23 @@ def generate_task_progress_table(df):
 
         if percent_complete < 100 and end_date < datetime.datetime.now():
             status = "⚠️ Overdue"
-            alert_class = "alert-danger"
+            progress_color = "red"  # Red for overdue
         elif 0 < percent_complete < 100:
             status = "🚧 In Progress"
-            alert_class = "alert-warning"
+            progress_color = "orange"  # Orange for in progress
         elif percent_complete == 0:
             status = "Not Started"
-            alert_class = "alert-warning"
+            progress_color = "grey"  # Grey for not started
         else:
             status = "✅ Completed"
-            alert_class = "alert-success"
+            progress_color = "#4CAF50"  # Green for completed (same as before)
 
         table_rows += f"""
         <tr>
             <td>{task_name}</td>
             <td>
                 <div style="background-color: #eee; border-radius: 5px;">
-                    <div style="background-color: #4CAF50; width: {percent_complete}%; height: 20px; border-radius: 5px;"></div>
+                    <div style="background-color: {progress_color}; width: {percent_complete}%; height: 20px; border-radius: 5px;"></div>
                 </div> 
                 <span>{percent_complete:.1f}%</span>
             </td>
