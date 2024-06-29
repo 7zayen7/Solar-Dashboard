@@ -56,8 +56,6 @@ with col2:
 
 # --- Constants ---
 EXCEL_FILENAME = 'solar_project_data.xlsx'
-LOGO_PATH1 = "dt arabic logo .png"
-LOGO_PATH2 = "Neom.png"
 
 # --- File Watcher (Optional) ---
 class FileChangeHandler(FileSystemEventHandler):
@@ -131,28 +129,6 @@ def generate_pdf_report(filtered_df):
             .alert-danger {{ background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }}
             .alert-success {{ background-color: #d4edda; border-color: #c3e6cb; color: #155724; }}
         </style>
-    
-        <body>
-        <div style="display: flex; justify-content: space-around; align-items: center; padding: 20px;">
-            <img src="data:image/png;base64, {base64.b64encode(open(LOGO_PATH1, "rb").read()).decode()}" width=200 />
-            <img src="data:image/png;base64, {base64.b64encode(open(LOGO_PATH2, "rb").read()).decode()}" width=200 />
-        </div>
-        <h1>Project Report - NEOM Bay Airport</h1>
-        <h2>Table of Contents</h2>
-        <ul>
-            <li><a href="#key-metrics">Key Metrics</a></li>
-            <li><a href="#financial-details">Financial Details</a></li>
-            <li><a href="#gantt-chart">Gantt Chart</a></li>
-            <li><a href="#cost-comparison-chart">Cost Comparison Chart</a></li>
-            <li><a href="#budget-allocation-chart">Budget Allocation Chart</a></li>
-            <li><a href="#task-progress">Task Progress</a></li>
-            <li><a href="#cost-variance-alerts">Cost Variance Alerts</a></li>
-        </ul>
-
-        <h2 id="key-metrics">Key Metrics</h2>
-        <p><b>Total Tasks:</b> {len(st.session_state.df)}</p>
-        <p><b>Tasks Completed:</b> {st.session_state.df['Percent Complete'].value_counts().get(100, 0)}</p>
-    
     </head>
     <body>
         <h1>Project Report - NEOM Bay Airport</h1>
