@@ -18,69 +18,6 @@ import io
 from io import StringIO
 import uuid
 
-# --- Sidebar Customization ---
-st.sidebar.header("Customize Dashboard")
-
-# Color Scheme
-selected_theme = st.sidebar.selectbox("Theme", ["Light", "Dark", "Custom"])
-
-if selected_theme == "Custom":
-    primary_color = st.sidebar.color_picker("Primary Color")
-    background_color = st.sidebar.color_picker("Background Color")
-    # ... (Add more color pickers for other elements)
-
-# Layout
-selected_layout = st.sidebar.selectbox("Layout", ["Single Column", "Two Columns"])
-
-# --- Apply Customization ---
-
-# Theme
-if selected_theme == "Light":
-    st.markdown(
-        """
-        <style>
-            .stApp {
-                background-color: #f4f4f4; /* Light background */
-                color: #333;             /* Dark text */
-            }
-            /* Add styles for other elements in light mode */
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-elif selected_theme == "Dark":
-    st.markdown(
-        """
-        <style>
-            .stApp {
-                background-color: #222;   /* Dark background */
-                color: #f4f4f4;         /* Light text */
-            }
-            /* Add styles for other elements in dark mode */
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-elif selected_theme == "Custom":
-    # ... (Your existing code for the custom theme)
-
-# Layout
-if selected_layout == "Single Column":
-    # Use st.container() or st.columns(1) for single-column layout
-    st.write("This is a single-column layout")  # Placeholder, replace with your actual content
-
-elif selected_layout == "Two Columns":
-    # Use st.columns(2) for two-column layout
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("This is the first column")
-    with col2:
-        st.write("This is the second column")
-
-else:
-    st.error("Invalid layout selection")
-
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
