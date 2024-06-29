@@ -200,6 +200,9 @@ def generate_task_progress_table(df):
         elif percent_complete < 100:
             status = "🚧 In Progress"
             alert_class = "alert-warning"
+        elif percent_complete = 0:
+            status = "🚧 Not Started"
+            alert_class = "alert-warning"
         else:
             status = "✅ Completed"
             alert_class = "alert-success"
