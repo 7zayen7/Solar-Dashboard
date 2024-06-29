@@ -271,7 +271,7 @@ def create_cost_comparison_chart(df):
     )
     fig.update_layout(
         width=1200,  # Adjust the width as needed
-        height=500  # Adjust the height as needed
+        height=600  # Adjust the height as needed
     )
     return fig.to_image(format="png")
 
