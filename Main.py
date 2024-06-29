@@ -446,22 +446,28 @@ with tab2:
 
     st.subheader("Earned Value Management (EVM)")
 
-    # Calculate EVM metrics for each task and for the project as a whole
-    for index, row in filtered_df.iterrows():
-        filtered_df.loc[index, 'EV'] = row['Budget'] * (row['Percent Complete'] / 100)
-        filtered_df.loc[index, 'SV'] = row['EV'] - row['Planned Value']
-        filtered_df.loc[index, 'CV'] = row['EV'] - row['Actual Cost']
-        filtered_df.loc[index, 'SPI'] = row['EV'] / row['Planned Value'] if row['Planned Value'] != 0 else 0
-        filtered_df.loc[index, 'CPI'] = row['EV'] / row['Actual Cost'] if row['Actual Cost'] != 0 else 0
+    # EVM Calculations (with Error Handling)
+    st.subheader("Earned Value Management (EVM)")
 
-    # Aggregate EVM metrics for the entire project
-    total_pv = filtered_df['Planned Value'].sum()
-    total_ev = filtered_df['EV'].sum()
-    total_ac = filtered_df['Actual Cost'].sum()
-    project_sv = total_ev - total_pv
-    project_cv = total_ev - total_ac
-    project_spi = total_ev / total_pv if total_pv != 0 else 0
-    project_cpi = total_ev / total_ac if total_ac != 0 else 0
+    if 'Planned Value' not in filtered_df.columns:
+        st.error("Error: 'Planned Value' column not found in the data. Please check the Excel file.")
+    else:
+        # Calculate EVM metrics for each task and for the project as a whole
+        for index, row in filtered_df.iterrows():
+            filtered_df.loc[index, 'EV'] = row['Budget'] * (row['Percent Complete'] / 100)
+            filtered_df.loc[index, 'SV'] = row['EV'] - row['Planned Value']
+            filtered_df.loc[index, 'CV'] = row['EV'] - row['Actual Cost']
+            filtered_df.loc[index, 'SPI'] = row['EV'] / row['Planned Value'] if row['Planned Value'] != 0 else 0
+            filtered_df.loc[index, 'CPI'] = row['EV'] / row['Actual Cost'] if row['Actual Cost'] != 0 else 0
+
+        # Aggregate EVM metrics for the entire project
+        total_pv = filtered_df['Planned Value'].sum()
+        total_ev = filtered_df['EV'].sum()
+        total_ac = filtered_df['Actual Cost'].sum()
+        project_sv = total_ev - total_pv
+        project_cv = total_ev - total_ac
+        project_spi = total_ev / total_pv if total_pv != 0 else 0
+        project_cpi = total_ev / total_ac if total_ac != 0 else 0
 
     # Display EVM metrics as cards
     col1, col2, col3, col4 = st.columns(4)
