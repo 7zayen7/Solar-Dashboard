@@ -444,9 +444,6 @@ with tab2:
     else:
         st.write("No financial data to display.")
 
-    st.subheader("Earned Value Management (EVM)")
-
-    # EVM Calculations (with Error Handling)
     # EVM Calculations (using 'Budget' as Planned Value)
     st.subheader("Earned Value Management (EVM)")
 
@@ -475,17 +472,12 @@ with tab2:
     project_spi = total_ev / total_pv if total_pv != 0 else 0
     project_cpi = total_ev / total_ac if total_ac != 0 else 0
 
-    # Add CSS to style the metric card labels
+    # CSS to force black text color
     st.markdown(
         """
         <style>
-        div[data-testid="metric-container"] {
-            color: black !important; /* Force black text */
-        }
-        div[data-testid="metric-container"] > label[data-testid="stMetricLabel"] {
-            white-space: normal;       /* Allow label text to wrap */
-            overflow: hidden;           /* Prevent label text from overflowing */
-            text-overflow: ellipsis; /* Show ellipsis (...) for long label text */
+        .stMetricValue {
+            color: black !important;
         }
         </style>
         """,
