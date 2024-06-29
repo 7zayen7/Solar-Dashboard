@@ -18,10 +18,6 @@ import io
 from io import StringIO
 import uuid
 
-# --- Configuration for wkhtmltopdf ---
-path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'  # Replace with your actual path
-config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
-
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
