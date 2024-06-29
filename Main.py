@@ -158,13 +158,23 @@ def generate_pdf_report(filtered_df):
     return pdf
 
 def create_gantt_chart(df):
-    fig = px.timeline(df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
+    # Define a color map for each unique category
+    unique_categories = df['Category'].unique()
+    color_map = {category: px.colors.qualitative.Plotly[i % len(px.colors.qualitative.Plotly)] 
+                 for i, category in enumerate(unique_categories)}
+
+    # Create the Gantt chart
+    fig = px.timeline(df, x_start="Start Date", x_end="End Date", y="Task", color="Category",
+                      color_discrete_map=color_map)
+
+    # Update layout and traces for styling
     fig.update_layout(
         plot_bgcolor="white",
         paper_bgcolor="white"
     )
     fig.update_traces(marker=dict(line=dict(width=2, color='DarkSlateGrey')))
     fig.update_yaxes(autorange="reversed")
+
     return fig.to_image(format="png")
 
 def generate_cost_variance_alerts(df):
