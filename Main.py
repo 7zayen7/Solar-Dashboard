@@ -77,6 +77,7 @@ elif selected_layout == "Two Columns":  # Corrected indentation for this elif bl
         st.write("This is the first column")
     with col2:
         st.write("This is the second column")
+    # ... (Add the rest of your two-column layout content here)
 
 else:
     st.error("Invalid layout selection")
