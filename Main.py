@@ -66,22 +66,21 @@ elif selected_theme == "Custom":
     # ... (Your existing code for the custom theme)
 
 # Layout
-if selected_layout == "Single Column":  # Corrected indentation for this if block
+if selected_layout == "Single Column":
     # Use st.container() or st.columns(1) for single-column layout
-    st.write("This is a single-column layout") # Placeholder, replace with your actual content
+    st.write("This is a single-column layout")  # Placeholder, replace with your actual content
 
-elif selected_layout == "Two Columns":  # Corrected indentation for this elif block
+elif selected_layout == "Two Columns":
     # Use st.columns(2) for two-column layout
     col1, col2 = st.columns(2)
     with col1:
         st.write("This is the first column")
     with col2:
         st.write("This is the second column")
-    # ... (Add the rest of your two-column layout content here)
 
 else:
     st.error("Invalid layout selection")
-    
+
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
