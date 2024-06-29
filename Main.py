@@ -36,22 +36,34 @@ selected_layout = st.sidebar.selectbox("Layout", ["Single Column", "Two Columns"
 
 # Theme
 if selected_theme == "Light":
-    # Apply light theme styles (using st.markdown with custom CSS)
-elif selected_theme == "Dark":
-    # Apply dark theme styles (using st.markdown with custom CSS)
-elif selected_theme == "Custom":
     st.markdown(
-        f"""
+        """
         <style>
-            .stApp {{
-                background-color: {background_color};
-                color: {primary_color};
-            }}
-            /* ... (Style other elements using primary_color and background_color) */
+            .stApp {
+                background-color: #f4f4f4; /* Light background */
+                color: #333;             /* Dark text */
+            }
+            /* Add styles for other elements in light mode */
         </style>
         """,
         unsafe_allow_html=True,
     )
+
+elif selected_theme == "Dark":  # Indent this block!
+    st.markdown(
+        """
+        <style>
+            .stApp {
+                background-color: #222;   /* Dark background */
+                color: #f4f4f4;         /* Light text */
+            }
+            /* Add styles for other elements in dark mode */
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+elif selected_theme == "Custom":
 
 # Layout
 if selected_layout == "Single Column":
