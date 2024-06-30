@@ -211,27 +211,6 @@ def generate_pdf_report(filtered_df, procurement_df, risk_df):
     </div>
     """
 
-    # Create Risk Matrix Chart
-    def create_risk_matrix(risk_df):
-        fig = px.scatter(
-            risk_df,
-            x="Probability",
-            y="Impact",
-            size="Impact",
-            color="Category",
-            hover_name="Risk Description",
-            labels={"Probability": "Probability of Occurrence", "Impact": "Impact on Project"},
-            title="Risk Matrix"
-        )
-
-        # Update color scheme
-        fig.update_traces(marker=dict(
-            color=[px.colors.qualitative.Plotly[i] for i in range(len(risk_df))],
-            line=dict(width=2, color='DarkSlateGrey'))
-        )
-
-        return fig.to_image(format="png")
-
     # Inject updated risk section before cost variance alerts
     html_string = html_string.replace("<h2>Cost Variance Alerts</h2>",
                                       risk_table_html + "<h2>Cost Variance Alerts</h2>")
