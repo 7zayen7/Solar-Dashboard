@@ -200,18 +200,6 @@ def generate_pdf_report(filtered_df):
        </table>
        """
 
-
-    # Risk Management Section (Added)
-    risk_table_html = f"""
-       <h2>Risk Management</h2>
-       {pd.DataFrame(risk_data).to_html(index=False, classes='risk-table')}
-       """
-
-    # Inject risk data after EVM
-    html_string = html_string.replace(
-        "<h2>Cost Variance Alerts</h2>", evm_metrics_html + risk_table_html + "<h2>Cost Variance Alerts</h2>"
-    )
-
     # Procurement Summary Section (New)
     procurement_summary_html = f"""
     <h2>Procurement Summary</h2>
@@ -621,23 +609,28 @@ with tab2:
     spi_cpi_trend = px.line(filtered_df, x='Start Date', y=['SPI', 'CPI'], title='SPI and CPI Trends')
     st.plotly_chart(spi_cpi_trend)
 
+# --- Data Loading and Processing for Risk Data ---
+def load_risk_data(filename='risk.xlsx'):
+    df = pd.read_excel(filename)
+    return df
+
 with tab3:
     # --- Risk Management ---
-    st.subheader("Risk Management")
+    st.header("Risk Management")
 
-    risk_data = {
-        'Risk': ['Material delays', 'Weather disruptions', 'Permitting issues', 'Labor shortage'],
-        'Probability': ['Medium', 'High', 'Low', 'Medium'],
-        'Impact': ['High', 'Medium', 'Medium', 'Low'],
-        'Mitigation Plan': ['Secure backup suppliers', 'Contingency schedule', 'Proactive communication',
-                            'Cross-training']
-    }
+    # Load Risk Data
+    risk_df = load_risk_data()
 
-    st.table(pd.DataFrame(risk_data))
+    # Risk Table
+    st.subheader("Risk Register")
+    st.dataframe(risk_df)
 
-    # --- Data Exploration Table ---
-    st.subheader("Data Table")
-    st.write(filtered_df)
+    # Risk Matrix
+    st.subheader("Risk Matrix")
+    fig = px.scatter(risk_df, x="Probability", y="Impact", color="Category",
+                     hover_name="Risk Description", title="Risk Matrix",
+                     labels={"Probability": "Probability of Occurrence", "Impact": "Impact on Project"})
+    st.plotly_chart(fig)
 
 def load_procurement_data(filename='Procurement.xlsx'):
     df = pd.read_excel(filename)
