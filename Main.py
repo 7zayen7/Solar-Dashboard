@@ -201,16 +201,33 @@ def generate_pdf_report(filtered_df):
        """
 
 
-    # Risk Management Section (Added)
+    # Updated Risk Management Section
     risk_table_html = f"""
-       <h2>Risk Management</h2>
-       {pd.DataFrame(risk_data).to_html(index=False, classes='risk-table')}
-       """
+    <h2>Risk Management</h2>
+    {risk_df.to_html(index=False, classes='risk-table')}
 
-    # Inject risk data after EVM
-    html_string = html_string.replace(
-        "<h2>Cost Variance Alerts</h2>", evm_metrics_html + risk_table_html + "<h2>Cost Variance Alerts</h2>"
-    )
+    <h3>Risk Matrix</h3>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_risk_matrix(risk_df)).decode()}' />
+    </div>
+    """
+
+    # Create Risk Matrix Chart
+    def create_risk_matrix(risk_df):
+        fig = px.scatter(
+            risk_df,
+            x="Probability",
+            y="Impact",
+            size="Impact",
+            color="Category",
+            hover_name="Risk Description",
+            labels={"Probability": "Probability of Occurrence", "Impact": "Impact on Project"},
+            title="Risk Matrix"
+        )
+        return fig.to_image(format="png")
+
+    # Inject updated risk section before cost variance alerts
+    html_string = html_string.replace("<h2>Cost Variance Alerts</h2>", risk_table_html + "<h2>Cost Variance Alerts</h2>")
 
     # Procurement Summary Section (New)
     procurement_summary_html = f"""
