@@ -621,28 +621,23 @@ with tab2:
     spi_cpi_trend = px.line(filtered_df, x='Start Date', y=['SPI', 'CPI'], title='SPI and CPI Trends')
     st.plotly_chart(spi_cpi_trend)
 
-# --- Data Loading and Processing for Risk Data ---
-def load_risk_data(filename='risk.xlsx'):
-    df = pd.read_excel(filename)
-    return df
-
 with tab3:
     # --- Risk Management ---
-    st.header("Risk Management")
+    st.subheader("Risk Management")
 
-    # Load Risk Data
-    risk_df = load_risk_data()
+    risk_data = {
+        'Risk': ['Material delays', 'Weather disruptions', 'Permitting issues', 'Labor shortage'],
+        'Probability': ['Medium', 'High', 'Low', 'Medium'],
+        'Impact': ['High', 'Medium', 'Medium', 'Low'],
+        'Mitigation Plan': ['Secure backup suppliers', 'Contingency schedule', 'Proactive communication',
+                            'Cross-training']
+    }
 
-    # Risk Table
-    st.subheader("Risk Register")
-    st.dataframe(risk_df)
+    st.table(pd.DataFrame(risk_data))
 
-    # Risk Matrix
-    st.subheader("Risk Matrix")
-    fig = px.scatter(risk_df, x="Probability", y="Impact", color="Category",
-                     hover_name="Risk Description", title="Risk Matrix",
-                     labels={"Probability": "Probability of Occurrence", "Impact": "Impact on Project"})
-    st.plotly_chart(fig)
+    # --- Data Exploration Table ---
+    st.subheader("Data Table")
+    st.write(filtered_df)
 
 def load_procurement_data(filename='Procurement.xlsx'):
     df = pd.read_excel(filename)
