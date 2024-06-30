@@ -622,7 +622,7 @@ with tab2:
     st.plotly_chart(spi_cpi_trend)
 
 # --- Data Loading and Processing for Risk Data ---
-def load_risk_data(filename=RISK_EXCEL_FILENAME):
+def load_risk_data(filename='risk.xlsx'):
     df = pd.read_excel(filename)
     return df
 
