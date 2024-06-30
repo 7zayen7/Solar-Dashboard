@@ -200,6 +200,21 @@ def generate_pdf_report(filtered_df):
        </table>
        """
 
+    # Updated Risk Management Section
+    risk_table_html = f"""
+    <h2>Risk Management</h2>
+    {risk_df.to_html(index=False, classes='risk-table')}
+
+    <h3>Risk Matrix</h3>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <img style="width: 80%;" src='data:image/png;base64,{base64.b64encode(create_risk_matrix(risk_df)).decode()}' />
+    </div>
+    """
+    
+    # Inject updated risk section before cost variance alerts
+    html_string = html_string.replace("<h2>Cost Variance Alerts</h2>",
+                                      risk_table_html + "<h2>Cost Variance Alerts</h2>")
+
     # Procurement Summary Section (New)
     procurement_summary_html = f"""
     <h2>Procurement Summary</h2>
