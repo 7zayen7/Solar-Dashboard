@@ -368,17 +368,25 @@ with col1:
 with col2:
     st.button("Edit Excel File", on_click=edit_excel_file)
 
-# --- Project Overview ---
+# --- Data Loading and Processing for Project Overview ---
+def load_project_overview(filename='project_overview.xlsx'):
+    df = pd.read_excel(filename)
+    return df.set_index("Field")["Value"].to_dict()
+
+# --- Session State Initialization ---
+if 'project_overview' not in st.session_state:
+    st.session_state.project_overview = load_project_overview()
+project_overview = st.session_state.project_overview
+
+
+# --- Project Overview Section ---
 st.header("NEOM Bay Airport Project Dashboard")
 st.subheader("Project Details")
-if not st.session_state.df.empty:
-    st.write(f"**Client:** NEOM")
-    st.write(f"**Project Name:** NEOM Bay Airport")
-    st.write(f"**Location:** NEOM, KSA")
-    st.write(f"**Start Date:** {st.session_state.df['Start Date'].min().date()}")
-    st.write(f"**End Date:** {st.session_state.df['End Date'].max().date()}")
+if project_overview:
+    for field, value in project_overview.items():
+        st.write(f"**{field}:** {value}")
 else:
-    st.warning("No data found. Please check the Excel file.")
+    st.warning("Project overview data not found. Please check the Excel file.")
 
 # --- Dashboard with Tabs ---
 tab1, tab2, tab3, tab4 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management", "Procurement Tracking"])
