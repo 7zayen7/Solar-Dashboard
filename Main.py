@@ -67,21 +67,6 @@ def main():
 
                 # Display the rest of your dashboard content here (tabs, metrics, charts, etc.)
 
-            else:
-                st.warning("Incorrect Username/Password")
-
-    elif choice == "SignUp":
-        st.subheader("Create New Account")
-        new_user = st.text_input("Username")
-        new_password = st.text_input("Password", type='password')
-        if st.button("Signup"):
-            add_userdata(new_user, new_password)
-            st.success("You have successfully created a valid Account")
-            st.info("Go to Login Menu to login")
-
-if __name__ == '__main__':
-    main()
-    
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
@@ -793,3 +778,18 @@ st.subheader("Project Timeline")
 fig_timeline = px.timeline(st.session_state.df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
 fig_timeline.update_yaxes(autorange="reversed")
 st.plotly_chart(fig_timeline)  # Interactive timeline
+
+            else:
+                st.warning("Incorrect Username/Password")
+
+    elif choice == "SignUp":
+        st.subheader("Create New Account")
+        new_user = st.text_input("Username")
+        new_password = st.text_input("Password", type='password')
+        if st.button("Signup"):
+            add_userdata(new_user, new_password)
+            st.success("You have successfully created a valid Account")
+            st.info("Go to Login Menu to login")
+
+if __name__ == '__main__':
+    main()
