@@ -200,9 +200,6 @@ def generate_pdf_report(filtered_df):
        </table>
        """
 
-    # Add the EVM metrics to the HTML string
-    html_string = html_string.replace("<h2>Cost Variance Alerts</h2>",
-                                      evm_metrics_html + "<h2>Cost Variance Alerts</h2>")
 
     # Risk Management Section (Added)
     risk_table_html = f"""
