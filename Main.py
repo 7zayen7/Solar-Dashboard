@@ -222,17 +222,17 @@ def generate_pdf_report(filtered_df):
     {procurement_df.to_html(index=False, classes='procurement-table')}
     """
 
-    # Cost Over Time Chart (Procurement)
+    # Cost Over Time Chart (Procurement) with color scheme
     cost_over_time_data = (
         procurement_df.groupby(pd.Grouper(key='Order Date', freq='M'))['Total Cost']
         .sum()
         .reset_index()
     )
-    fig_cost_over_time = px.line(cost_over_time_data, x='Order Date', y='Total Cost', title='Procurement Cost Over Time')
+    fig_cost_over_time = px.line(cost_over_time_data, x='Order Date', y='Total Cost', title='Procurement Cost Over Time', color_discrete_sequence=px.colors.qualitative.Plotly)
 
-    # PO Status Chart (Procurement)
+    # PO Status Chart (Procurement) with color scheme
     status_counts = procurement_df['Status'].value_counts()
-    fig_status = px.pie(status_counts, values=status_counts.values, names=status_counts.index, title='PO Status')
+    fig_status = px.pie(status_counts, values=status_counts.values, names=status_counts.index, title='PO Status', color_discrete_sequence=px.colors.qualitative.Plotly)
 
     # Inject the procurement section after risk assessment
     html_string = html_string.replace(
