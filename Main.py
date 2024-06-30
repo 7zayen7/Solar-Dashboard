@@ -352,7 +352,7 @@ def create_budget_allocation_chart(df):
     )
     fig.update_layout(
         width=2000,  # Adjust the width as needed
-        height=1000  # Adjust the height as needed
+        height=2000  # Adjust the height as needed
     )
     return fig.to_image(format="png")
 
