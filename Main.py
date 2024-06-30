@@ -107,7 +107,7 @@ filtered_df = st.session_state.df[
     ]
 
 # --- Report Generation ---
-def generate_pdf_report(filtered_df):
+def generate_pdf_report(filtered_df, procurement_df, risk_df):
     """Generates a PDF report from the filtered DataFrame."""
 
     # Create HTML content with the filtered data and any desired formatting
@@ -200,7 +200,6 @@ def generate_pdf_report(filtered_df):
        </table>
        """
 
-
     # Updated Risk Management Section
     risk_table_html = f"""
     <h2>Risk Management</h2>
@@ -224,10 +223,18 @@ def generate_pdf_report(filtered_df):
             labels={"Probability": "Probability of Occurrence", "Impact": "Impact on Project"},
             title="Risk Matrix"
         )
+
+        # Update color scheme
+        fig.update_traces(marker=dict(
+            color=[px.colors.qualitative.Plotly[i] for i in range(len(risk_df))],
+            line=dict(width=2, color='DarkSlateGrey'))
+        )
+
         return fig.to_image(format="png")
 
     # Inject updated risk section before cost variance alerts
-    html_string = html_string.replace("<h2>Cost Variance Alerts</h2>", risk_table_html + "<h2>Cost Variance Alerts</h2>")
+    html_string = html_string.replace("<h2>Cost Variance Alerts</h2>",
+                                      risk_table_html + "<h2>Cost Variance Alerts</h2>")
 
     # Procurement Summary Section (New)
     procurement_summary_html = f"""
