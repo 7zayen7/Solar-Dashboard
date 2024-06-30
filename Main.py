@@ -172,6 +172,37 @@ def generate_pdf_report(filtered_df):
     </body>
     </html>
     """
+    
+    # EVM Metrics Section (Added)
+    evm_metrics_html = f"""
+       <h2>Earned Value Management (EVM) Metrics</h2>
+       <table style="width:50%"> 
+           <tr>
+               <th>Metric</th>
+               <th>Value</th>
+           </tr>
+           <tr>
+               <td>Schedule Variance (SV)</td>
+               <td>{project_sv:.2f} $</td>
+           </tr>
+           <tr>
+               <td>Cost Variance (CV)</td>
+               <td>{project_cv:.2f} $</td>
+           </tr>
+           <tr>
+               <td>Schedule Performance Index (SPI)</td>
+               <td>{project_spi:.2f}</td>
+           </tr>
+           <tr>
+               <td>Cost Performance Index (CPI)</td>
+               <td>{project_cpi:.2f}</td>
+           </tr>
+       </table>
+       """
+
+    # Add the EVM metrics to the HTML string
+    html_string = html_string.replace("<h2>Cost Variance Alerts</h2>",
+                                      evm_metrics_html + "<h2>Cost Variance Alerts</h2>")
 
     options = {
         'page-size': 'Letter',
