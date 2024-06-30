@@ -172,7 +172,7 @@ def generate_pdf_report(filtered_df):
     </body>
     </html>
     """
-    
+
     # EVM Metrics Section (Added)
     evm_metrics_html = f"""
        <h2>Earned Value Management (EVM) Metrics</h2>
@@ -203,6 +203,17 @@ def generate_pdf_report(filtered_df):
     # Add the EVM metrics to the HTML string
     html_string = html_string.replace("<h2>Cost Variance Alerts</h2>",
                                       evm_metrics_html + "<h2>Cost Variance Alerts</h2>")
+
+    # Risk Management Section (Added)
+    risk_table_html = f"""
+       <h2>Risk Management</h2>
+       {pd.DataFrame(risk_data).to_html(index=False, classes='risk-table')}
+       """
+
+    # Inject risk data after EVM
+    html_string = html_string.replace(
+        "<h2>Cost Variance Alerts</h2>", evm_metrics_html + risk_table_html + "<h2>Cost Variance Alerts</h2>"
+    )
 
     options = {
         'page-size': 'Letter',
