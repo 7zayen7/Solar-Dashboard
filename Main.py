@@ -283,7 +283,6 @@ def create_gantt_chart(df):
 
     return fig.to_image(format="png")
 
-
 def generate_cost_variance_alerts(df):
     alerts_html = ""
     for _, row in df.iterrows():
@@ -632,3 +631,24 @@ st.subheader("Project Timeline")
 fig_timeline = px.timeline(st.session_state.df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
 fig_timeline.update_yaxes(autorange="reversed")
 st.plotly_chart(fig_timeline)  # Interactive timeline
+
+# After all other content in your app
+st.markdown(
+    """
+    <style>
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f0f0f0;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+    <div class="footer">
+        <small>Dashboard developed by M. Hzayen</small>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
