@@ -350,7 +350,7 @@ else:
     st.warning("No data found. Please check the Excel file.")
 
 # --- Dashboard with Tabs ---
-tab1, tab2, tab3 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management"])
+tab1, tab2, tab3, tab4 = st.tabs(["Progress Overview", "Financial Tracking", "Risk Management", "Procurement Tracking"])
 
 with tab1:
     # --- Progress Tracking ---
@@ -599,6 +599,62 @@ with tab3:
     # --- Data Exploration Table ---
     st.subheader("Data Table")
     st.write(filtered_df)
+
+def load_procurement_data(filename='Procurement.xlsx'):
+    df = pd.read_excel(filename)
+    df['Order Date'] = pd.to_datetime(df['Order Date'])  # Convert to datetime
+    df['Delivery Date'] = pd.to_datetime(df['Delivery Date'])
+    return df
+
+with tab4:
+    st.header("Procurement Dashboard")
+
+    # Load and display data
+    procurement_df = load_procurement_data()
+    st.subheader("All Purchase Orders")
+    st.dataframe(procurement_df) 
+
+    # --- KPI cards for metrics ---
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown(
+            f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+            f'<span style="color:black">Total POs: {len(procurement_df)}</span>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    with col2:
+        total_cost = procurement_df['Total Cost'].sum()
+        st.markdown(
+            f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+            f'<span style="color:black">Total Cost: ${total_cost:.2f}</span>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    with col3:
+        st.markdown(
+            f'<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">'
+            f'<span style="color:black">Average Cost/PO: ${total_cost / len(procurement_df):.2f}</span>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+    # Total Cost over time graph
+    st.subheader("Total Cost Over Time")
+    cost_over_time_data = (
+        procurement_df.groupby(pd.Grouper(key='Order Date', freq='M'))['Total Cost']
+        .sum()
+        .reset_index()
+    )
+    fig_cost_over_time = px.line(cost_over_time_data, x='Order Date', y='Total Cost')
+    st.plotly_chart(fig_cost_over_time, use_container_width=True)
+
+    # PO status
+    st.subheader('PO Status')
+    status_counts = procurement_df['Status'].value_counts()
+    fig_status = px.pie(status_counts, values=status_counts.values, names=status_counts.index)
+    st.plotly_chart(fig_status)
 
 # --- Report Generation Button ---
 st.sidebar.subheader("Generate Report")
