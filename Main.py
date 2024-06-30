@@ -232,13 +232,12 @@ def generate_pdf_report(filtered_df):
         height=800
     )
 
-    # Inject the procurement section after risk assessment with a page break before charts
+    # Inject the procurement section after risk assessment
     html_string = html_string.replace(
         "<h2>Cost Variance Alerts</h2>",
         procurement_summary_html
-        + f"<div style='page-break-before: always;'></div>"  # Add page break here
-        + f"<div style='display: flex; justify-content: center; align-items: center;'><img style='width: 80%;' src='data:image/svg+xml;base64,{base64.b64encode(fig_cost_over_time_svg.encode('utf-8')).decode('utf-8')}' /></div>"
-        + f"<div style='display: flex; justify-content: center; align-items: center;'><img style='width: 80%;' src='data:image/svg+xml;base64,{base64.b64encode(fig_status_svg.encode('utf-8')).decode('utf-8')}' /></div>"
+        + f"<div style='display: flex; justify-content: center; align-items: center;'><img style='width: 80%;' src='data:image/png;base64,{base64.b64encode(fig_cost_over_time.to_image(format='png')).decode()}' /></div>"
+        + f"<div style='display: flex; justify-content: center; align-items: center;'><img style='width: 80%;' src='data:image/png;base64,{base64.b64encode(fig_status.to_image(format='png')).decode()}' /></div>"
         + "<h2>Cost Variance Alerts</h2>"
     )
 
