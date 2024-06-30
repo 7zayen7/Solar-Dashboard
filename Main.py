@@ -107,7 +107,7 @@ filtered_df = st.session_state.df[
     ]
 
 # --- Report Generation ---
-def generate_pdf_report(filtered_df, procurement_df, risk_df):
+def generate_pdf_report(filtered_df):
     """Generates a PDF report from the filtered DataFrame."""
 
     # Create HTML content with the filtered data and any desired formatting
