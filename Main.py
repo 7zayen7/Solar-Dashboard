@@ -212,6 +212,37 @@ def generate_pdf_report(filtered_df):
         "<h2>Cost Variance Alerts</h2>", evm_metrics_html + risk_table_html + "<h2>Cost Variance Alerts</h2>"
     )
 
+    # Procurement Summary Section (New)
+    procurement_summary_html = f"""
+    <h2>Procurement Summary</h2>
+    <p><b>Total Purchase Orders:</b> {len(procurement_df)}</p>
+    <p><b>Total Procurement Cost:</b> ${procurement_df['Total Cost'].sum():.2f}</p>
+
+    <h3>Purchase Orders</h3>
+    {procurement_df.to_html(index=False, classes='procurement-table')}
+    """
+
+    # Cost Over Time Chart (Procurement)
+    cost_over_time_data = (
+        procurement_df.groupby(pd.Grouper(key='Order Date', freq='M'))['Total Cost']
+        .sum()
+        .reset_index()
+    )
+    fig_cost_over_time = px.line(cost_over_time_data, x='Order Date', y='Total Cost', title='Procurement Cost Over Time')
+
+    # PO Status Chart (Procurement)
+    status_counts = procurement_df['Status'].value_counts()
+    fig_status = px.pie(status_counts, values=status_counts.values, names=status_counts.index, title='PO Status')
+
+    # Inject the procurement section after risk assessment
+    html_string = html_string.replace(
+        "<h2>Cost Variance Alerts</h2>",
+        procurement_summary_html
+        + f"<div style='display: flex; justify-content: center; align-items: center;'><img style='width: 80%;' src='data:image/png;base64,{base64.b64encode(fig_cost_over_time.to_image(format='png')).decode()}' /></div>"
+        + f"<div style='display: flex; justify-content: center; align-items: center;'><img style='width: 80%;' src='data:image/png;base64,{base64.b64encode(fig_status.to_image(format='png')).decode()}' /></div>"
+        + "<h2>Cost Variance Alerts</h2>"
+    )
+
     options = {
         'page-size': 'Letter',
         'margin-top': '0.75in',
@@ -612,7 +643,7 @@ with tab4:
     # Load and display data
     procurement_df = load_procurement_data()
     st.subheader("All Purchase Orders")
-    st.dataframe(procurement_df) 
+    st.dataframe(procurement_df)
 
     # --- KPI cards for metrics ---
     col1, col2, col3 = st.columns(3)
