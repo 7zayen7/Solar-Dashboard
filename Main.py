@@ -17,39 +17,71 @@ import contextlib
 import io
 from io import StringIO
 import uuid
+import sqlite3
+from passlib.hash import bcrypt  # For password hashing
 
-def check_password():
-    """Returns `True` if the user had the correct password."""
+# --- Database Functions ---
 
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if st.session_state["password"] == st.secrets["password"]:
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Don't store the password in session state
-        else:
-            st.session_state["password_correct"] = False
+def create_usertable():
+    conn = sqlite3.connect('users.db')  # Create a database file
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT PRIMARY KEY, password TEXT)')
+    conn.commit()
+    conn.close()
 
-    if "password_correct" not in st.session_state:
-        # First run, show input for password.
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        return False
-    elif not st.session_state["password_correct"]:
-        # Password not correct, show input + error.
-        st.text_input(
-            "Password", type="password", on_change=password_entered, key="password"
-        )
-        st.error("😕 Password incorrect")
-        return False
-    else:
-        # Password correct.
+def add_userdata(username, password):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    hashed_password = bcrypt.hash(password)  # Hash the password
+    c.execute('INSERT INTO userstable(username,password) VALUES (?,?)', (username, hashed_password))
+    conn.commit()
+    conn.close()
+
+def login_user(username, password):
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM userstable WHERE username = ?', (username,))
+    data = c.fetchall()
+    conn.close()
+    if data and bcrypt.verify(password, data[0][1]):  # Compare hashed passwords
         return True
+    else:
+        return False
 
-if check_password():
-    # Rest of your app goes here
-    st.write("Welcome to the dashboard!")
+# --- Authentication ---
 
+def main():
+    st.title("NEOM Bay Airport Project Dashboard")
+    create_usertable()
+
+    menu = ["Login", "SignUp"]
+    choice = st.sidebar.selectbox("Menu", menu)
+
+    if choice == "Login":
+        st.subheader("Login Section")
+        username = st.text_input("User Name")
+        password = st.text_input("Password", type='password')
+        if st.button("Login"):
+            if login_user(username, password):
+                st.success("Logged In as {}".format(username))
+
+                # Display the rest of your dashboard content here (tabs, metrics, charts, etc.)
+
+            else:
+                st.warning("Incorrect Username/Password")
+
+    elif choice == "SignUp":
+        st.subheader("Create New Account")
+        new_user = st.text_input("Username")
+        new_password = st.text_input("Password", type='password')
+        if st.button("Signup"):
+            add_userdata(new_user, new_password)
+            st.success("You have successfully created a valid Account")
+            st.info("Go to Login Menu to login")
+
+if __name__ == '__main__':
+    main()
+    
 # --- Add Logo ---
 col1, col2 = st.columns(2)
 with col1:
