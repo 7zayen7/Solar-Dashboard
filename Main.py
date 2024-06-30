@@ -718,19 +718,3 @@ st.subheader("Project Timeline")
 fig_timeline = px.timeline(st.session_state.df, x_start="Start Date", x_end="End Date", y="Task", color="Category")
 fig_timeline.update_yaxes(autorange="reversed")
 st.plotly_chart(fig_timeline)  # Interactive timeline
-
-# After all other content in your app
-st.markdown(
-    """
-    <style>
-        .footer {
-            /* ... other styles ... */
-            background-color: #333; /* Change background color */
-        }
-    </style>
-    <div class="footer">
-        <small>Dashboard developed by M. Hzayen</small>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
