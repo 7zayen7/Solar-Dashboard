@@ -637,13 +637,8 @@ st.markdown(
     """
     <style>
         .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #f0f0f0;
-            padding: 10px;
-            text-align: center;
+            /* ... other styles ... */
+            background-color: #333; /* Change background color */
         }
     </style>
     <div class="footer">
