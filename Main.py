@@ -72,26 +72,18 @@ def edit_excel_file():
 
 
 # --- Data Loading and Processing ---
-def load_and_process_data():
-    # ... (OneDrive authentication code)
-
-    # Update this path to your actual file path on SharePoint! (See explanation below)
-    file_path = "sites/deserttech-my.sharepoint.com,mhzayen_desert-technologies_com/drive/root:/personal/mhzayen_desert-technologies_com/Documents/Shared with Everyone/solar_project_data.xlsx"
-
+def load_and_process_data(filename='solar_project_data.xlsx'):
     try:
-        # Get the download URL for the file
-        item = onedrive.get_item(item_path=file_path)
-        download_url = item.web_url
-
-        # Read the Excel file directly from the download URL
-        df = pd.read_excel(download_url)
-
-        # ... (rest of your data processing as before) ...
+        df = pd.read_excel(filename)
+        df['Cost Variance'] = df['Budget'] - df['Actual Cost']
+        df.fillna(0, inplace=True)
+        df['Start Date'] = pd.to_datetime(df['Start Date'])
+        df['End Date'] = pd.to_datetime(df['End Date'])
         return df
+    except FileNotFoundError:
+        st.error(f"Error: File '{filename}' not found. Make sure it's in the same directory as this script.")
+        st.stop()
 
-    except Exception as e:
-        st.error(f"Error loading SharePoint file: {e}")
-        return pd.DataFrame()
 
 # --- Session State Initialization ---
 if 'df' not in st.session_state:
