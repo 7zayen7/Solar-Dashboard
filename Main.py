@@ -70,56 +70,25 @@ def edit_excel_file():
     file_path = os.path.abspath(EXCEL_FILENAME)
     webbrowser.open(file_path)
 
-# Project Name to List of File Paths Mapping
-PROJECT_FILES = {
-    "NEOM Bay Airport": [
-        "solar_project_data.xlsx",
-        "project_overview.xlsx",
-        "risk.xlsx",
-        "procuerment.xlsx"
-    ],
-    "Project Alpha": [
-        "solar_project_data.xlsx",
-        "project_overview.xlsx",
-        "risk.xlsx",
-        "procuerment.xlsx"
-    ],
-}
-def load_project_data(project_name):
-    """Loads and concatenates data for the specified project from multiple files."""
-    dfs = []
-    for filename in PROJECT_FILES.get(project_name, []):
-        try:
-            df = pd.read_excel(filename)
-            df['Cost Variance'] = df['Budget'] - df['Actual Cost']  # Assuming this applies to all relevant files
-            df.fillna(0, inplace=True)
-            df['Start Date'] = pd.to_datetime(df['Start Date'])
-            df['End Date'] = pd.to_datetime(df['End Date'])
-            dfs.append(df)
-        except FileNotFoundError:
-            st.warning(f"File '{filename}' not found for project '{project_name}'.")
-    if dfs:
-        return pd.concat(dfs, ignore_index=True)  # Concatenate all loaded DataFrames
-    else:
-        st.error(f"No data files found for project '{project_name}'.")
-        return pd.DataFrame()
 
-# --- Project Selection ---
-st.sidebar.header("Select Project")
-selected_project = st.sidebar.selectbox("Project", list(PROJECT_FILES.keys()))
+# --- Data Loading and Processing ---
+def load_and_process_data(filename='solar_project_data.xlsx'):
+    try:
+        df = pd.read_excel(filename)
+        df['Cost Variance'] = df['Budget'] - df['Actual Cost']
+        df.fillna(0, inplace=True)
+        df['Start Date'] = pd.to_datetime(df['Start Date'])
+        df['End Date'] = pd.to_datetime(df['End Date'])
+        return df
+    except FileNotFoundError:
+        st.error(f"Error: File '{filename}' not found. Make sure it's in the same directory as this script.")
+        st.stop()
 
-# --- Load Project Data ---
-if selected_project:
-    st.session_state.df = load_project_data(selected_project)
-    project_overview = load_project_overview(selected_project)
-    risk_df = load_risk_data(selected_project)
-    procurement_df = load_procurement_data(selected_project)
 
-    df = st.session_state.df.copy()  # Make a copy to avoid modifying session state directly
-
-    # Make a copy to avoid modifying session state directly
-    df = st.session_state.df.copy()
-
+# --- Session State Initialization ---
+if 'df' not in st.session_state:
+    st.session_state.df = load_and_process_data()
+df = st.session_state.df
 
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
@@ -129,16 +98,14 @@ start_time = st.session_state.df['Start Date'].min().date()
 end_time = st.session_state.df['End Date'].max().date()
 start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
 
-# Apply filters after project data is loaded and check for empty DataFrame
-if df.empty:  # Check if df is empty after loading
-    st.warning("No data found for the selected project or filters.")
-else:
-    filtered_df = df[
-        (df['Category'].isin(selected_categories)) &
-        (df['Task'].str.contains(task_filter, case=False)) &
-        (df['Start Date'].dt.date >= start_date) &
-        (df['End Date'].dt.date <= end_date)
-        ]
+# Apply filters directly to session state data
+filtered_df = st.session_state.df[
+    (st.session_state.df['Category'].isin(selected_categories)) &
+    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
+    (st.session_state.df['Start Date'].dt.date >= start_date) &
+    (st.session_state.df['End Date'].dt.date <= end_date)
+    ]
+
 # --- Report Generation ---
 def generate_pdf_report(filtered_df):
     """Generates a PDF report from the filtered DataFrame."""
