@@ -83,33 +83,25 @@ PROJECT_FILES = {
         "risk.xlsx"
     ],
 }
-
-
 def load_project_data(project_name):
-    """Loads and concatenates data for the specified project from multiple files, 
-    handling cases where 'Budget' or 'Actual Cost' columns might be missing."""
+    """Loads and concatenates data for the specified project from multiple files."""
     dfs = []
     for filename in PROJECT_FILES.get(project_name, []):
         try:
             df = pd.read_excel(filename)
-
-            # Check for columns and calculate if present
-            if 'Budget' in df and 'Actual Cost' in df:
-                df['Cost Variance'] = df['Budget'] - df['Actual Cost']
-
-            df.fillna(0, inplace=True)  # Assuming you want to fill NaNs regardless of columns present
-            df['Start Date'] = pd.to_datetime(df['Start Date'], errors='coerce')
-            df['End Date'] = pd.to_datetime(df['End Date'], errors='coerce')
+            df['Cost Variance'] = df['Budget'] - df['Actual Cost']  # Assuming this applies to all relevant files
+            df.fillna(0, inplace=True)
+            df['Start Date'] = pd.to_datetime(df['Start Date'])
+            df['End Date'] = pd.to_datetime(df['End Date'])
             dfs.append(df)
         except FileNotFoundError:
             st.warning(f"File '{filename}' not found for project '{project_name}'.")
-
     if dfs:
-        return pd.concat(dfs, ignore_index=True)
+        return pd.concat(dfs, ignore_index=True)  # Concatenate all loaded DataFrames
     else:
         st.error(f"No data files found for project '{project_name}'.")
         return pd.DataFrame()
-    
+
 # --- Project Selection ---
 st.sidebar.header("Select Project")
 selected_project = st.sidebar.selectbox("Project", list(PROJECT_FILES.keys()))
@@ -123,6 +115,10 @@ if selected_project:
 
     df = st.session_state.df.copy()  # Make a copy to avoid modifying session state directly
 
+    # Make a copy to avoid modifying session state directly
+    df = st.session_state.df.copy() 
+
+
 # --- Sidebar Filters ---
 st.sidebar.header("Filters")
 selected_categories = st.sidebar.multiselect("Filter by Category", st.session_state.df['Category'].unique())
@@ -131,14 +127,16 @@ start_time = st.session_state.df['Start Date'].min().date()
 end_time = st.session_state.df['End Date'].max().date()
 start_date, end_date = st.sidebar.date_input("Select Date Range", value=(start_time, end_time))
 
-# Apply filters directly to session state data
-filtered_df = st.session_state.df[
-    (st.session_state.df['Category'].isin(selected_categories)) &
-    (st.session_state.df['Task'].str.contains(task_filter, case=False)) &
-    (st.session_state.df['Start Date'].dt.date >= start_date) &
-    (st.session_state.df['End Date'].dt.date <= end_date)
-    ]
-
+# Apply filters after project data is loaded and check for empty DataFrame
+if df.empty:  # Check if df is empty after loading
+    st.warning("No data found for the selected project or filters.")
+else:
+    filtered_df = df[
+        (df['Category'].isin(selected_categories)) &
+        (df['Task'].str.contains(task_filter, case=False)) &
+        (df['Start Date'].dt.date >= start_date) &
+        (df['End Date'].dt.date <= end_date)
+        ]
 # --- Report Generation ---
 def generate_pdf_report(filtered_df):
     """Generates a PDF report from the filtered DataFrame."""
