@@ -72,7 +72,7 @@ def edit_excel_file():
 
 
 # --- Data Loading and Processing ---
-def load_and_process_data(filename='solar_project_data.xlsx'):
+def load_and_process_data(filename='https://deserttech-my.sharepoint.com/:x:/g/personal/mhzayen_desert-technologies_com/EXAC06IYd1BMv2uBXCU968wBy4e615TWHNo0m9WBGIoU3g?e=g01izt'):
     try:
         df = pd.read_excel(filename)
         df['Cost Variance'] = df['Budget'] - df['Actual Cost']
