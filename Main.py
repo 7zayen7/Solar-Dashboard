@@ -83,25 +83,33 @@ PROJECT_FILES = {
         "risk.xlsx"
     ],
 }
+
+
 def load_project_data(project_name):
-    """Loads and concatenates data for the specified project from multiple files."""
+    """Loads and concatenates data for the specified project from multiple files, 
+    handling cases where 'Budget' or 'Actual Cost' columns might be missing."""
     dfs = []
     for filename in PROJECT_FILES.get(project_name, []):
         try:
             df = pd.read_excel(filename)
-            df['Cost Variance'] = df['Budget'] - df['Actual Cost']  # Assuming this applies to all relevant files
-            df.fillna(0, inplace=True)
-            df['Start Date'] = pd.to_datetime(df['Start Date'])
-            df['End Date'] = pd.to_datetime(df['End Date'])
+
+            # Check for columns and calculate if present
+            if 'Budget' in df and 'Actual Cost' in df:
+                df['Cost Variance'] = df['Budget'] - df['Actual Cost']
+
+            df.fillna(0, inplace=True)  # Assuming you want to fill NaNs regardless of columns present
+            df['Start Date'] = pd.to_datetime(df['Start Date'], errors='coerce')
+            df['End Date'] = pd.to_datetime(df['End Date'], errors='coerce')
             dfs.append(df)
         except FileNotFoundError:
             st.warning(f"File '{filename}' not found for project '{project_name}'.")
+
     if dfs:
-        return pd.concat(dfs, ignore_index=True)  # Concatenate all loaded DataFrames
+        return pd.concat(dfs, ignore_index=True)
     else:
         st.error(f"No data files found for project '{project_name}'.")
         return pd.DataFrame()
-
+    
 # --- Project Selection ---
 st.sidebar.header("Select Project")
 selected_project = st.sidebar.selectbox("Project", list(PROJECT_FILES.keys()))
