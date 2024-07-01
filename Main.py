@@ -75,12 +75,14 @@ PROJECT_FILES = {
     "NEOM Bay Airport": [
         "solar_project_data.xlsx",
         "project_overview.xlsx",
-        "risk.xlsx"
+        "risk.xlsx",
+        "procuerment.xlsx"
     ],
     "Project Alpha": [
         "solar_project_data.xlsx",
         "project_overview.xlsx",
-        "risk.xlsx"
+        "risk.xlsx",
+        "procuerment.xlsx"
     ],
 }
 def load_project_data(project_name):
@@ -116,7 +118,7 @@ if selected_project:
     df = st.session_state.df.copy()  # Make a copy to avoid modifying session state directly
 
     # Make a copy to avoid modifying session state directly
-    df = st.session_state.df.copy() 
+    df = st.session_state.df.copy()
 
 
 # --- Sidebar Filters ---
