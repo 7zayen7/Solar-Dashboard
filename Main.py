@@ -82,7 +82,7 @@ PROJECT_FILES = {
         "project_overview.xlsx",
         "risk.xlsx"
     ],
-
+}
 def load_project_data(project_name):
     """Loads and concatenates data for the specified project from multiple files."""
     dfs = []
