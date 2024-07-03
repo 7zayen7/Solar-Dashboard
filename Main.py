@@ -55,7 +55,7 @@ with col2:
         st.image(logo_path, width=100)
 
 # --- Constants ---
-EXCEL_FILENAME = 'solar_project_data.xlsx'
+EXCEL_FILENAME = {'solar_project_data.xlsx','Procurement.xlsx', 'risk.xlsx', 'project_overview.xlsx'}
 
 # --- File Watcher (Optional) ---
 class FileChangeHandler(FileSystemEventHandler):
@@ -735,4 +735,5 @@ st.plotly_chart(fig_timeline)  # Interactive timeline
 def refresh_data():
     st.session_state.df = load_and_process_data()  # Refresh solar project data
     st.session_state.project_overview = load_project_overview()  # Refresh project overview data
+    st.session_state.risk_df = load_risk_data()  # Refresh risk data
     st.session_state.procurement_df = load_procurement_data()  # Refresh procurement data
