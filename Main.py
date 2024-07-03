@@ -356,8 +356,10 @@ def create_budget_allocation_chart(df):
 
 # --- Refresh Function ---
 def refresh_data():
-    st.session_state.df = load_and_process_data()
-
+    st.session_state.df = load_and_process_data()  # Refresh solar project data
+    st.session_state.project_overview = load_project_overview()  # Refresh project overview data
+    st.session_state.risk_df = load_risk_data()  # Refresh risk data
+    st.session_state.procurement_df = load_procurement_data()  # Refresh procurement data
 
 # --- Refresh Button and Edit Button ---
 col1, col2 = st.columns(2)
