@@ -55,7 +55,7 @@ with col2:
         st.image(logo_path, width=100)
 
 # --- Constants ---
-EXCEL_FILENAME = 'solar_project_data.xlsx'
+EXCEL_FILENAME = {'solar_project_data.xlsx','Procurement.xlsx', 'risk.xlsx', 'project_overview.xlsx'}
 
 # --- File Watcher (Optional) ---
 class FileChangeHandler(FileSystemEventHandler):
