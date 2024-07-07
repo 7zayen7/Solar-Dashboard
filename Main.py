@@ -380,7 +380,7 @@ project_overview = st.session_state.project_overview
 
 
 # --- Project Overview Section ---
-st.header("NEOM Bay Airport Project Dashboard")
+st.header("Saudi Telecom Company PPA Project")
 st.subheader("Project Details")
 if project_overview:
     for field, value in project_overview.items():
